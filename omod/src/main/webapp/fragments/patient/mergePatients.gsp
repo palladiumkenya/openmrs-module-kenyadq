@@ -2,7 +2,7 @@
 	ui.decorateWith("kenyaui", "panel", [ heading: "Merge Patients", frameOnly: true ])
 %>
 
-<form id="merge-patients-form" method="post" action="${ ui.actionLink("kenyadq", "mergePatients", "mergePatients") }">
+<form id="merge-patients-form" method="post" action="${ ui.actionLink("kenyadq", "patient/mergePatients", "merge") }">
 
 	<div class="ke-panel-controls">
 		${ ui.includeFragment("kenyaui", "widget/buttonlet", [
@@ -12,7 +12,9 @@
 
 	<div class="ke-panel-content">
 
-		<div class="ke-form-globalerrors" style="display: none"></div>
+		<div class="ke-warning" style="margin-bottom: 5px">Merging patients is something that should not be taken lightly. There is no automatic way to undo this action.</div>
+
+		<div class="ke-form-globalerrors" style="display: none; margin-bottom: 5px"></div>
 
 		<table style="width: 100%">
 			<tr>
@@ -20,8 +22,8 @@
 				<td class="ke-field-label" style="width: 50%; text-align: center">Patient 2</td>
 			</tr>
 			<tr>
-				<td>${ ui.includeFragment("kenyaui", "widget/field", [ id: "patient1-select", object: command, property: "patient1" ]) }</td>
-				<td>${ ui.includeFragment("kenyaui", "widget/field", [ id: "patient2-select", object: command, property: "patient2" ]) }</td>
+				<td style="text-align: center">${ ui.includeFragment("kenyaui", "widget/field", [ id: "patient1-select", object: command, property: "patient1" ]) }</td>
+				<td style="text-align: center">${ ui.includeFragment("kenyaui", "widget/field", [ id: "patient2-select", object: command, property: "patient2" ]) }</td>
 			</tr>
 			<tr>
 				<td style="vertical-align: top">
@@ -33,7 +35,21 @@
 				<td style="vertical-align: top">
 					<fieldset>
 						<legend>Information</legend>
-						<div id="patient2-infopoints" class="patient1-item"></div>
+						<div id="patient2-infopoints" class="patient2-item"></div>
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td style="vertical-align: top">
+					<fieldset>
+						<legend>Names</legend>
+						<div id="patient1-names" class="patient1-item"></div>
+					</fieldset>
+				</td>
+				<td style="vertical-align: top">
+					<fieldset>
+						<legend>Names</legend>
+						<div id="patient2-names" class="patient2-item"></div>
 					</fieldset>
 				</td>
 			</tr>
@@ -47,7 +63,21 @@
 				<td style="vertical-align: top">
 					<fieldset>
 						<legend>Identifiers</legend>
-						<div id="patient2-identifiers" class="patient1-item"></div>
+						<div id="patient2-identifiers" class="patient2-item"></div>
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td style="vertical-align: top">
+					<fieldset>
+						<legend>Attributes</legend>
+						<div id="patient1-attributes" class="patient1-item"></div>
+					</fieldset>
+				</td>
+				<td style="vertical-align: top">
+					<fieldset>
+						<legend>Attributes</legend>
+						<div id="patient2-attributes" class="patient2-item"></div>
 					</fieldset>
 				</td>
 			</tr>
@@ -55,7 +85,7 @@
 				<td style="vertical-align: top">
 					<fieldset>
 						<legend>Encounters</legend>
-						<div id="patient1-encounters" class="patient2-item"></div>
+						<div id="patient1-encounters" class="patient1-item"></div>
 					</fieldset>
 				</td>
 				<td style="vertical-align: top">
@@ -70,7 +100,7 @@
 	</div>
 
 	<div class="ke-panel-controls">
-		<input class="ke-button" type="submit" value="Merge" />
+		<input class="ke-button merge-button" type="button" value="Merge" />
 		<input class="ke-button cancel-button" type="button" value="Cancel"/>
 	</div>
 
@@ -78,6 +108,13 @@
 
 <script type="text/javascript">
 	jq(function() {
+		jq('#merge-patients-form .merge-button').click(function() {
+			kenyaui.openConfirmDialog({
+				heading: 'Merge',
+				message: 'Merge the two selected patient records? Continue only if you are 100% positive these are the same patients.',
+				okCallback: function () { jq('#merge-patients-form').submit(); }
+			});
+		});
 		jq('#merge-patients-form .cancel-button').click(function() {
 			location.href = '${ returnUrl }';
 		});
@@ -107,7 +144,9 @@
 		kenyaui.setSearchFieldValue('patient2-select', patient1Id);
 
 		swapContent('#patient1-infopoints', '#patient2-infopoints');
+		swapContent('#patient1-names', '#patient2-names');
 		swapContent('#patient1-identifiers', '#patient2-identifiers');
+		swapContent('#patient1-attributes', '#patient2-attributes');
 		swapContent('#patient1-encounters', '#patient2-encounters');
 	}
 
@@ -121,7 +160,10 @@
 
 		ui.getFragmentActionAsJson('kenyadq', 'patient/mergePatients', 'patientSummary', { patientId : patientId }, function (patient) {
 			showDataPoints('#patient' + position + '-infopoints', patient.infopoints);
+			showDataPoints('#patient' + position + '-names', patient.names);
 			showDataPoints('#patient' + position + '-identifiers', patient.identifiers);
+			showDataPoints('#patient' + position + '-attributes', patient.attributes);
+			showDataPoints('#patient' + position + '-encounters', patient.encounters);
 
 			jq('.patient' + position + '-item').removeClass('ke-loading');
 		});
@@ -136,7 +178,11 @@
 	}
 
 	function createDataPoint(label, value) {
-		return '<div class="ke-datapoint"><span class="ke-label">' + label + '</span>: <span class="ke-value">' + value + '</span></div>'
+		if (label) {
+			return '<div class="ke-datapoint"><span class="ke-label">' + label + '</span>: <span class="ke-value">' + value + '</span></div>';
+		} else {
+			return '<div class="ke-datapoint"><span class="ke-value">' + value + '</span></div>';
+		}
 	}
 
 	function swapContent(selector1, selector2) {

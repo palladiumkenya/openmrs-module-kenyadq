@@ -16,8 +16,11 @@ package org.openmrs.module.kenyadq.fragment.controller.patient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Encounter;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
+import org.openmrs.PersonAttribute;
+import org.openmrs.PersonName;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.kenyacore.identifier.IdentifierManager;
 import org.openmrs.module.kenyadq.DataQualityConstants;
@@ -34,6 +37,7 @@ import org.openmrs.ui.framework.fragment.action.FailureResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,14 +62,20 @@ public class MergePatientsFragmentController {
 	 * @return
 	 */
 	@AppAction(DataQualityConstants.APP_DATAQUALITY)
-	public Object mergePatients(@MethodParam("newMergePatientsForm") @BindParams MergePatientsForm form, UiUtils ui) {
+	public Object merge(@MethodParam("newMergePatientsForm") @BindParams MergePatientsForm form,
+						UiUtils ui,
+						@SpringBean KenyaUiUtils kenyaUi,
+						HttpSession session) {
 		ui.validate(form, form, null);
 
 		try {
 			Context.getPatientService().mergePatients(form.getPatient1(), form.getPatient2());
+
+			kenyaUi.notifySuccess(session, "Patients merged successfully");
 		}
 		catch (Exception ex) {
 			log.error("Unable to merge patients #" + form.getPatient1().getId() + " and #" + form.getPatient2().getId(), ex);
+
 			new FailureResult("Unable to merge");
 		}
 
@@ -79,9 +89,7 @@ public class MergePatientsFragmentController {
 	 */
 	@AppAction(DataQualityConstants.APP_DATAQUALITY)
 	public SimpleObject patientSummary(@RequestParam("patientId") Patient patient,
-									   UiUtils ui,
-									   @SpringBean KenyaUiUtils kenyaUi,
-									   @SpringBean IdentifierManager identifierManager) {
+									   @SpringBean KenyaUiUtils kenyaUi) {
 
 		List<SimpleObject> infopoints = new ArrayList<SimpleObject>();
 		infopoints.add(dataPoint("id", patient.getId()));
@@ -91,18 +99,46 @@ public class MergePatientsFragmentController {
 		infopoints.add(dataPoint("Created", kenyaUi.formatDate(patient.getDateCreated())));
 		infopoints.add(dataPoint("Modified", kenyaUi.formatDate(patient.getDateChanged())));
 
+		List<SimpleObject> names = new ArrayList<SimpleObject>();
+		for (PersonName name : patient.getNames()) {
+			names.add(dataPoint(null, name.getFullName()));
+		}
+
 		List<SimpleObject> identifiers = new ArrayList<SimpleObject>();
-		for (PatientIdentifier identifier : identifierManager.getPatientDisplayIdentifiers(patient)) {
+		for (PatientIdentifier identifier : patient.getActiveIdentifiers()) {
 			identifiers.add(dataPoint(identifier.getIdentifierType().getName(), identifier.getIdentifier()));
+		}
+
+		List<SimpleObject> attributes = new ArrayList<SimpleObject>();
+		for (PersonAttribute attribute : patient.getActiveAttributes()) {
+			attributes.add(dataPoint(attribute.getAttributeType().getName(), attribute.getValue()));
+		}
+
+		List<SimpleObject> encounters = new ArrayList<SimpleObject>();
+		for (Encounter encounter : Context.getEncounterService().getEncountersByPatient(patient)) {
+			StringBuilder sb = new StringBuilder(encounter.getEncounterType().getName());
+			if (encounter.getLocation() != null) {
+				sb.append(" @ " + encounter.getLocation().getName());
+			}
+			encounters.add(dataPoint(kenyaUi.formatDate(encounter.getEncounterDatetime()), sb.toString()));
 		}
 
 		SimpleObject summary = new SimpleObject();
 		summary.put("infopoints", infopoints);
+		summary.put("names", names);
 		summary.put("identifiers", identifiers);
+		summary.put("attributes", attributes);
+		summary.put("encounters", encounters);
 
 		return summary;
 	}
 
+	/**
+	 * Convenience method to create a simple data point object
+	 * @param label the label
+	 * @param value the value
+	 * @return the simple object
+	 */
 	protected SimpleObject dataPoint(String label, Object value) {
 		return SimpleObject.create("label", label, "value", value);
 	}
@@ -128,6 +164,10 @@ public class MergePatientsFragmentController {
 		public void validate(Object o, Errors errors) {
 			require(errors, "patient1");
 			require(errors, "patient2");
+
+			if (patient1 != null && patient2 != null && patient1.equals(patient2)) {
+				errors.reject("Patients must be different");
+			}
 		}
 
 		/**
