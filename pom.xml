@@ -39,9 +39,11 @@
 		<appframeworkVersion>1.5</appframeworkVersion>
 		<calculationVersion>1.0</calculationVersion>
 		<idgenVersion>2.5</idgenVersion>
-		<kenyacoreVersion>0.8.1</kenyacoreVersion>
+		<kenyacoreVersion>0.10</kenyacoreVersion>
 		<kenyauiVersion>1.12.2</kenyauiVersion>
 		<metadatasharingVersion>1.1.8</metadatasharingVersion>
+		<reportingVersion>0.7.6</reportingVersion>
+		<serializationxstreamVersion>0.2.7</serializationxstreamVersion>
 		<uiframeworkVersion>3.0</uiframeworkVersion>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -98,6 +100,20 @@
 				<groupId>org.openmrs.module</groupId>
 				<artifactId>metadatasharing-api</artifactId>
 				<version>${metadatasharingVersion}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>reporting-api</artifactId>
+				<version>${reportingVersion}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>serialization.xstream-api</artifactId>
+				<version>${serializationxstreamVersion}</version>
 				<scope>provided</scope>
 			</dependency>
 

@@ -14,8 +14,24 @@
 
 package org.openmrs.module.kenyadq.page.controller.dataqual;
 
+import org.openmrs.Program;
+import org.openmrs.module.appframework.AppDescriptor;
+import org.openmrs.module.kenyacore.program.ProgramDescriptor;
+import org.openmrs.module.kenyacore.program.ProgramManager;
+import org.openmrs.module.kenyacore.report.ReportDescriptor;
+import org.openmrs.module.kenyacore.report.ReportManager;
 import org.openmrs.module.kenyadq.DataQualityConstants;
+import org.openmrs.module.kenyaui.KenyaUiUtils;
 import org.openmrs.module.kenyaui.annotation.AppPage;
+import org.openmrs.ui.framework.SimpleObject;
+import org.openmrs.ui.framework.UiUtils;
+import org.openmrs.ui.framework.annotation.SpringBean;
+import org.openmrs.ui.framework.page.PageModel;
+import org.openmrs.ui.framework.page.PageRequest;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Data quality home page
@@ -23,6 +39,29 @@ import org.openmrs.module.kenyaui.annotation.AppPage;
 @AppPage(DataQualityConstants.APP_DATAQUALITY)
 public class DataQualityHomePageController {
 
-	public void controller() {
+	public void controller(PageModel model,
+						   PageRequest pageRequest,
+						   UiUtils ui,
+						   @SpringBean ReportManager reportManager,
+						   @SpringBean ProgramManager programManager,
+						   @SpringBean KenyaUiUtils kenyaUi) {
+
+		AppDescriptor currentApp = kenyaUi.getCurrentApp(pageRequest);
+
+		List<ReportDescriptor> commonReports = reportManager.getCommonReports(currentApp);
+
+		Map<String, SimpleObject[]> programReports = new LinkedHashMap<String, SimpleObject[]>();
+
+		for (ProgramDescriptor programDescriptor : programManager.getAllProgramDescriptors()) {
+			Program program = programDescriptor.getTarget();
+			List<ReportDescriptor> reports = reportManager.getProgramReports(currentApp, program);
+
+			if (reports.size() > 0) {
+				programReports.put(program.getName(), ui.simplifyCollection(reports));
+			}
+		}
+
+		model.addAttribute("commonReports", ui.simplifyCollection(commonReports));
+		model.addAttribute("programReports", programReports);
 	}
 }

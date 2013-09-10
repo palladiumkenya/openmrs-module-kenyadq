@@ -15,17 +15,11 @@
 package org.openmrs.module.kenyadq;
 
 /**
- * Constants used by KenyaDQ
+ * Metadata constants
  */
-public class DataQualityConstants {
+public class DqMetadata {
 
-	/**
-	 * Module ID
-	 */
-	public static final String MODULE_ID = "kenyadq";
-
-	/**
-	 * App IDs
-	 */
-	public static final String APP_DATAQUALITY = "kenyaemr.dataQuality";
+	public static final class Concept {
+		public static final String CIVIL_STATUS = "1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	}
 }
