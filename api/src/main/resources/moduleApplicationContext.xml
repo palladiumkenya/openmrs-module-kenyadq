@@ -9,8 +9,17 @@
 	<bean id="kenyaemr.dq.config.report" class="org.openmrs.module.kenyacore.report.ReportConfiguration">
 		<property name="commonReports">
 			<set>
-				<ref bean="kenyaemr.dq.report.missingMaritalStatus" />
+				<ref bean="kenyadq.common.report.missingMaritalStatus" />
 			</set>
+		</property>
+		<property name="programReports">
+			<map>
+				<entry key-ref="kenyaemr.hiv.program">
+					<set>
+						<ref bean="kenyadq.hiv.report.missingEntryPoint" />
+					</set>
+				</entry>
+			</map>
 		</property>
 	</bean>
 
@@ -26,9 +35,15 @@
 
 	<!-- ===================== Reports ===================== -->
 
-	<bean id="kenyaemr.dq.report.missingMaritalStatus" class="org.openmrs.module.kenyacore.report.CalculationReportDescriptor">
+	<bean id="kenyadq.common.report.missingMaritalStatus" class="org.openmrs.module.kenyacore.report.CalculationReportDescriptor">
 		<property name="name" value="Missing marital status" />
-		<property name="calculation" value="org.openmrs.module.kenyadq.calculation.MissingMaritalStatusCalculation" />
+		<property name="calculation" value="org.openmrs.module.kenyadq.calculation.common.MissingMaritalStatusCalculation" />
+		<property name="apps"><set><ref bean="kenyaemr.app.dataqual" /></set></property>
+	</bean>
+
+	<bean id="kenyadq.hiv.report.missingEntryPoint" class="org.openmrs.module.kenyacore.report.CalculationReportDescriptor">
+		<property name="name" value="Missing entry point" />
+		<property name="calculation" value="org.openmrs.module.kenyadq.calculation.hiv.MissingEntryPointCalculation" />
 		<property name="apps"><set><ref bean="kenyaemr.app.dataqual" /></set></property>
 	</bean>
 

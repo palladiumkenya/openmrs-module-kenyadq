@@ -12,7 +12,7 @@
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 
-package org.openmrs.module.kenyadq.calculation;
+package org.openmrs.module.kenyadq.calculation.common;
 
 import org.openmrs.Concept;
 import org.openmrs.calculation.BaseCalculation;
@@ -20,16 +20,12 @@ import org.openmrs.calculation.patient.PatientCalculation;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.calculation.result.ResultUtil;
-import org.openmrs.module.kenyacore.CoreConstants;
 import org.openmrs.module.kenyacore.calculation.BooleanResult;
-import org.openmrs.module.kenyacore.calculation.CalculationUtils;
+import org.openmrs.module.kenyacore.calculation.Calculations;
 import org.openmrs.module.kenyacore.metadata.MetadataUtils;
 import org.openmrs.module.kenyadq.DqMetadata;
-import org.openmrs.module.reporting.common.TimeQualifier;
-import org.openmrs.module.reporting.data.person.definition.ObsForPersonDataDefinition;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -43,7 +39,7 @@ public class MissingMaritalStatusCalculation extends BaseCalculation implements 
 	@Override
 	public CalculationResultMap evaluate(Collection<Integer> cohort, Map<String, Object> parameterValues, PatientCalculationContext context) {
 		Concept civilStatus = MetadataUtils.getConcept(DqMetadata.Concept.CIVIL_STATUS);
-		CalculationResultMap civilStatusObss = allObs(civilStatus, cohort, context);
+		CalculationResultMap civilStatusObss = Calculations.allObs(civilStatus, cohort, context);
 
 		CalculationResultMap ret = new CalculationResultMap();
 		for (int ptId : cohort) {
@@ -52,14 +48,5 @@ public class MissingMaritalStatusCalculation extends BaseCalculation implements 
 			ret.put(ptId, new BooleanResult(missing, this, context));
 		}
 		return ret;
-	}
-
-	/**
-	 * TODO this is a copy of the same function in BaseEmrCalculation. Need to work out where these belong...
-	 */
-	protected static CalculationResultMap allObs(Concept concept, Collection<Integer> cohort, PatientCalculationContext calculationContext) {
-		ObsForPersonDataDefinition def = new ObsForPersonDataDefinition("All " + concept.getPreferredName(CoreConstants.LOCALE),
-				TimeQualifier.ANY, concept, calculationContext.getNow(), null);
-		return CalculationUtils.evaluateWithReporting(def, cohort, new HashMap<String, Object>(), null, calculationContext);
 	}
 }

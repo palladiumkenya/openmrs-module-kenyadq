@@ -21,5 +21,10 @@ public class DqMetadata {
 
 	public static final class Concept {
 		public static final String CIVIL_STATUS = "1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+		public static final String METHOD_OF_ENROLLMENT = "160540AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	}
+
+	public static final class Program {
+		public static final String HIV = "dfdc6d40-2f2f-463d-ba90-cc97350441a8";
 	}
 }

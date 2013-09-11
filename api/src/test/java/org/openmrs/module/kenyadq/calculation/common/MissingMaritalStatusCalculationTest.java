@@ -12,7 +12,7 @@
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 
-package org.openmrs.module.kenyadq.calculation;
+package org.openmrs.module.kenyadq.calculation.common;
 
 import org.junit.Assert;
 import org.junit.Before;
