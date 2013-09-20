@@ -6,7 +6,7 @@
 
 	<!-- ===================== Configurations ===================== -->
 
-	<bean id="kenyaemr.dq.config.report" class="org.openmrs.module.kenyacore.report.ReportConfiguration">
+	<bean id="kenyadq.config.report" class="org.openmrs.module.kenyacore.report.ReportConfiguration">
 		<property name="commonReports">
 			<set>
 				<ref bean="kenyadq.common.report.missingMaritalStatus" />
@@ -17,6 +17,7 @@
 				<entry key-ref="kenyaemr.hiv.program">
 					<set>
 						<ref bean="kenyadq.hiv.report.missingEntryPoint" />
+						<ref bean="kenyadq.hiv.report.missingConfirmedPositiveDate" />
 					</set>
 				</entry>
 			</map>
@@ -25,26 +26,34 @@
 
 	<!-- ===================== Apps ===================== -->
 
-	<bean id="kenyaemr.app.dataqual" class="org.openmrs.module.appframework.SimpleAppDescriptor">
-		<property name="id" value="kenyaemr.dataQuality" />
+	<bean id="kenyadq.app.dataqual" class="org.openmrs.module.appframework.SimpleAppDescriptor">
+		<property name="id" value="kenyadq.dataQuality" />
 		<property name="label" value="Data Quality" />
 		<property name="homepageUrl" value="kenyadq/dataqual/dataQualityHome.page" />
 		<property name="iconUrl" value="kenyadq:apps/dataqual.png" />
 		<property name="order" value="550" />
 	</bean>
 
-	<!-- ===================== Reports ===================== -->
+	<!-- ===================== Common reports ===================== -->
 
 	<bean id="kenyadq.common.report.missingMaritalStatus" class="org.openmrs.module.kenyacore.report.CalculationReportDescriptor">
 		<property name="name" value="Missing marital status" />
 		<property name="calculation" value="org.openmrs.module.kenyadq.calculation.common.MissingMaritalStatusCalculation" />
-		<property name="apps"><set><ref bean="kenyaemr.app.dataqual" /></set></property>
+		<property name="apps"><set><ref bean="kenyadq.app.dataqual" /></set></property>
 	</bean>
+
+	<!-- ===================== HIV reports ===================== -->
 
 	<bean id="kenyadq.hiv.report.missingEntryPoint" class="org.openmrs.module.kenyacore.report.CalculationReportDescriptor">
 		<property name="name" value="Missing entry point" />
 		<property name="calculation" value="org.openmrs.module.kenyadq.calculation.hiv.MissingEntryPointCalculation" />
-		<property name="apps"><set><ref bean="kenyaemr.app.dataqual" /></set></property>
+		<property name="apps"><set><ref bean="kenyadq.app.dataqual" /></set></property>
+	</bean>
+
+	<bean id="kenyadq.hiv.report.missingConfirmedPositiveDate" class="org.openmrs.module.kenyacore.report.CalculationReportDescriptor">
+		<property name="name" value="Missing date confirmed HIV+" />
+		<property name="calculation" value="org.openmrs.module.kenyadq.calculation.hiv.MissingHivConfirmedDateCalculation" />
+		<property name="apps"><set><ref bean="kenyadq.app.dataqual" /></set></property>
 	</bean>
 
 </beans>

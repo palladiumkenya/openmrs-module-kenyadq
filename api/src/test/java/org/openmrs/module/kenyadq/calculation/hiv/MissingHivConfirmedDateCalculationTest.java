@@ -31,9 +31,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Tests for {@link MissingEntryPointCalculation}
+ * Tests for {@link MissingHivConfirmedDateCalculation}
  */
-public class MissingEntryPointCalculationTest extends BaseModuleContextSensitiveTest {
+public class MissingHivConfirmedDateCalculationTest extends BaseModuleContextSensitiveTest {
 
 	/**
 	 * Setup each test
@@ -48,22 +48,21 @@ public class MissingEntryPointCalculationTest extends BaseModuleContextSensitive
 		TestUtils.enrollInProgram(TestUtils.getPatient(6), hivProgram, TestUtils.date(2012, 5, 1));
 		TestUtils.enrollInProgram(TestUtils.getPatient(7), hivProgram, TestUtils.date(2012, 5, 1));
 
-		Concept method = MetadataUtils.getConcept(DqMetadata.Concept.METHOD_OF_ENROLLMENT);
-		Concept pmtct = MetadataUtils.getConcept("160538AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		Concept diagnosisDate = MetadataUtils.getConcept(DqMetadata.Concept.DATE_OF_HIV_DIAGNOSIS);
 
-		TestUtils.saveObs(TestUtils.getPatient(6), method, pmtct, TestUtils.date(2012, 5, 1));
+		TestUtils.saveObs(TestUtils.getPatient(6), diagnosisDate, TestUtils.date(2012, 1, 1), TestUtils.date(2012, 5, 1));
 	}
 
 	/**
-	 * @see MissingEntryPointCalculation#evaluate(java.util.Collection, java.util.Map, org.openmrs.calculation.patient.PatientCalculationContext)
+	 * @see MissingHivConfirmedDateCalculation#evaluate(java.util.Collection, java.util.Map, org.openmrs.calculation.patient.PatientCalculationContext)
 	 */
 	@Test
 	public void evaluate() {
 		List<Integer> cohort = Arrays.asList(2, 6, 7);
 
-		CalculationResultMap resultMap = new MissingEntryPointCalculation().evaluate(cohort, null, Context.getService(PatientCalculationService.class).createCalculationContext());
+		CalculationResultMap resultMap = new MissingHivConfirmedDateCalculation().evaluate(cohort, null, Context.getService(PatientCalculationService.class).createCalculationContext());
 		Assert.assertFalse((Boolean) resultMap.get(2).getValue()); // Never enrolled in HIV
-		Assert.assertFalse((Boolean) resultMap.get(6).getValue()); // Has entry obs
-		Assert.assertTrue((Boolean) resultMap.get(7).getValue()); // Missing entry obs
+		Assert.assertFalse((Boolean) resultMap.get(6).getValue()); // Has confirmed obs
+		Assert.assertTrue((Boolean) resultMap.get(7).getValue()); // Missing confirmed obs
 	}
 }

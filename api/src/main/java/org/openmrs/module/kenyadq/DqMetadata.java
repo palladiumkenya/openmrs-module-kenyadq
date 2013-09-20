@@ -21,6 +21,7 @@ public class DqMetadata {
 
 	public static final class Concept {
 		public static final String CIVIL_STATUS = "1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+		public static final String DATE_OF_HIV_DIAGNOSIS = "160554AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 		public static final String METHOD_OF_ENROLLMENT = "160540AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	}
 

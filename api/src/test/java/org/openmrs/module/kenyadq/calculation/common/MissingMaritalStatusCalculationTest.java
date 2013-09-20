@@ -40,7 +40,7 @@ public class MissingMaritalStatusCalculationTest extends BaseModuleContextSensit
 	 */
 	@Before
 	public void setup() throws Exception {
-		executeDataSet("test-data.xml");
+		executeDataSet("datasets/test-concepts.xml");
 
 		Concept civilStatus = MetadataUtils.getConcept(DqMetadata.Concept.CIVIL_STATUS);
 		Concept divorced = MetadataUtils.getConcept("1058AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");

@@ -22,8 +22,7 @@ import org.openmrs.PatientIdentifier;
 import org.openmrs.PersonAttribute;
 import org.openmrs.PersonName;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.kenyacore.identifier.IdentifierManager;
-import org.openmrs.module.kenyadq.DataQualityConstants;
+import org.openmrs.module.kenyadq.DqConstants;
 import org.openmrs.module.kenyaui.KenyaUiUtils;
 import org.openmrs.module.kenyaui.annotation.AppAction;
 import org.openmrs.module.kenyaui.validator.ValidatingCommandObject;
@@ -61,7 +60,7 @@ public class MergePatientsFragmentController {
 	 * @param ui
 	 * @return
 	 */
-	@AppAction(DataQualityConstants.APP_DATAQUALITY)
+	@AppAction(DqConstants.APP_DATAQUALITY)
 	public Object merge(@MethodParam("newMergePatientsForm") @BindParams MergePatientsForm form,
 						UiUtils ui,
 						@SpringBean KenyaUiUtils kenyaUi,
@@ -87,7 +86,7 @@ public class MergePatientsFragmentController {
 	 * @param patient the patient
 	 * @return the summary
 	 */
-	@AppAction(DataQualityConstants.APP_DATAQUALITY)
+	@AppAction(DqConstants.APP_DATAQUALITY)
 	public SimpleObject patientSummary(@RequestParam("patientId") Patient patient,
 									   @SpringBean KenyaUiUtils kenyaUi) {
 

@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+	<!-- =========================================== Programs =============================================== -->
+
+	<program program_id="1001" concept_id="160541" outcomes_concept_id="160038" creator="1" date_created="2004-08-12 00:00:00.0" retired="0" name="TB Program" description="TB Treatment Program" uuid="9f144a34-3a4a-44a9-8486-6b7af6cc64f6"/>
+	<program program_id="1002" concept_id="9" outcomes_concept_id="1695" creator="1" date_created="2004-08-12 00:00:00.0" retired="0" name="HIV Program" description="Program for following or treating HIV-positive patients" uuid="dfdc6d40-2f2f-463d-ba90-cc97350441a8"/>
+
+</dataset>

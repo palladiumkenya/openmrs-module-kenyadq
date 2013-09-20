@@ -17,7 +17,7 @@ package org.openmrs.module.kenyadq;
 /**
  * Constants used by KenyaDQ
  */
-public class DataQualityConstants {
+public class DqConstants {
 
 	/**
 	 * Module ID
@@ -27,5 +27,5 @@ public class DataQualityConstants {
 	/**
 	 * App IDs
 	 */
-	public static final String APP_DATAQUALITY = "kenyaemr.dataQuality";
+	public static final String APP_DATAQUALITY = MODULE_ID + ".dataQuality";
 }

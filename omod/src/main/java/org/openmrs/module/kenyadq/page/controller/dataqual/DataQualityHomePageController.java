@@ -20,7 +20,7 @@ import org.openmrs.module.kenyacore.program.ProgramDescriptor;
 import org.openmrs.module.kenyacore.program.ProgramManager;
 import org.openmrs.module.kenyacore.report.ReportDescriptor;
 import org.openmrs.module.kenyacore.report.ReportManager;
-import org.openmrs.module.kenyadq.DataQualityConstants;
+import org.openmrs.module.kenyadq.DqConstants;
 import org.openmrs.module.kenyaui.KenyaUiUtils;
 import org.openmrs.module.kenyaui.annotation.AppPage;
 import org.openmrs.ui.framework.SimpleObject;
@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * Data quality home page
  */
-@AppPage(DataQualityConstants.APP_DATAQUALITY)
+@AppPage(DqConstants.APP_DATAQUALITY)
 public class DataQualityHomePageController {
 
 	public void controller(PageModel model,

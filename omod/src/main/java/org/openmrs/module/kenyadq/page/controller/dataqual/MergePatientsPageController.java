@@ -14,7 +14,7 @@
 
 package org.openmrs.module.kenyadq.page.controller.dataqual;
 
-import org.openmrs.module.kenyadq.DataQualityConstants;
+import org.openmrs.module.kenyadq.DqConstants;
 import org.openmrs.module.kenyaui.annotation.AppPage;
 import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 /**
  * Merge patients page
  */
-@AppPage(DataQualityConstants.APP_DATAQUALITY)
+@AppPage(DqConstants.APP_DATAQUALITY)
 public class MergePatientsPageController {
 
 	public void controller(@RequestParam(required = false, value = "returnUrl") String returnUrl,
