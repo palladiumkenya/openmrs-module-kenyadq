@@ -98,8 +98,12 @@
 	</div>
 
 	<div class="ke-panel-controls">
-		<input class="ke-button merge-button" type="button" value="Merge" />
-		<input class="ke-button cancel-button" type="button" value="Cancel"/>
+		<button type="button" class="merge-button">
+			<img src="${ ui.resourceLink("kenyaui", "images/glyphs/ok.png") }" /> Merge
+		</button>
+		<button type="button" class="cancel-button">
+			<img src="${ ui.resourceLink("kenyaui", "images/glyphs/cancel.png") }" /> Cancel
+		</button>
 	</div>
 
 </form>
