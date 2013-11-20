@@ -6,7 +6,7 @@
 	${ ui.includeFragment("kenyaui", "widget/panelMenu", [
 			heading: "Tasks",
 			items: [
-					[ iconProvider: "kenyadq", icon: "buttons/patient_merge.png", label: "Merge Duplicate Patients", href: ui.pageLink("kenyadq", "dataqual/mergePatients", [ returnUrl: ui.thisUrl() ]) ]
+					[ iconProvider: "kenyadq", icon: "buttons/patient_merge.png", label: "Merge duplicate patients", href: ui.pageLink("kenyadq", "dataqual/mergePatients", [ returnUrl: ui.thisUrl() ]) ]
 			]
 	]) }
 </div>
