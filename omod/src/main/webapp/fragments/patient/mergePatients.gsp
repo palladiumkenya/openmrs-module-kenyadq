@@ -142,8 +142,8 @@
 		var patient1Id = jq('#patient1-select').val();
 		var patient2Id = jq('#patient2-select').val();
 
-		kenyaui.setSearchFieldValue('patient1-select', patient2Id);
-		kenyaui.setSearchFieldValue('patient2-select', patient1Id);
+		kenyaui.setSearchField('patient1-select', patient2Id);
+		kenyaui.setSearchField('patient2-select', patient1Id);
 
 		swapContent('#patient1-infopoints', '#patient2-infopoints');
 		swapContent('#patient1-names', '#patient2-names');
