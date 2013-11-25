@@ -11,7 +11,7 @@
 	<require_version>${openMRSVersion}</require_version>
 
 	<require_modules>
-		<require_module version="${kenyaemrVersion}">org.openmrs.module.kenyaemr</require_module>
+		<require_module version="${kenyacoreVersion}">org.openmrs.module.kenyacore</require_module>
 	</require_modules>
 
 	<activator>${project.parent.groupId}.${project.parent.artifactId}.DqActivator</activator>
