@@ -22,8 +22,8 @@ import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.calculation.result.ResultUtil;
 import org.openmrs.module.kenyacore.calculation.BooleanResult;
 import org.openmrs.module.kenyacore.calculation.Calculations;
-import org.openmrs.module.kenyacore.metadata.MetadataUtils;
 import org.openmrs.module.kenyadq.DqMetadata;
+import org.openmrs.module.metadatadeploy.MetadataUtils;
 
 import java.util.Collection;
 import java.util.Map;
