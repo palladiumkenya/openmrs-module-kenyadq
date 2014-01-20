@@ -26,12 +26,14 @@
 
 	<!-- ===================== Apps ===================== -->
 
-	<bean id="kenyadq.app.dataqual" class="org.openmrs.module.appframework.SimpleAppDescriptor">
-		<property name="id" value="kenyadq.dataQuality" />
-		<property name="label" value="Data Quality" />
-		<property name="homepageUrl" value="kenyadq/dataqual/dataQualityHome.page" />
-		<property name="iconUrl" value="kenyadq:apps/dataqual.png" />
-		<property name="order" value="550" />
+	<bean id="kenyadq.app.dataqual" class="org.openmrs.module.appframework.domain.AppDescriptor">
+		<constructor-arg name="id" value="kenyadq.dataQuality" />
+		<constructor-arg name="description" value="" />
+		<constructor-arg name="label" value="Data Quality" />
+		<constructor-arg name="url" value="kenyadq/dataqual/dataQualityHome.page" />
+		<constructor-arg name="icon" value="kenyadq:apps/dataqual.png" />
+		<constructor-arg name="tinyIcon" value="" />
+		<constructor-arg name="order" value="550" />
 	</bean>
 
 	<!-- ===================== Common reports ===================== -->

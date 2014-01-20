@@ -15,7 +15,7 @@
 package org.openmrs.module.kenyadq.page.controller.dataqual;
 
 import org.openmrs.Program;
-import org.openmrs.module.appframework.AppDescriptor;
+import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.kenyacore.program.ProgramDescriptor;
 import org.openmrs.module.kenyacore.program.ProgramManager;
 import org.openmrs.module.kenyacore.report.ReportDescriptor;
