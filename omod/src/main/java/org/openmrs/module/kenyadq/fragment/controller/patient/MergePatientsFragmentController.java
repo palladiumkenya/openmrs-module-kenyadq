@@ -23,6 +23,7 @@ import org.openmrs.PersonAttribute;
 import org.openmrs.PersonName;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.kenyadq.DqConstants;
+import org.openmrs.module.kenyadq.api.KenyaDqService;
 import org.openmrs.module.kenyaui.KenyaUiUtils;
 import org.openmrs.module.kenyaui.annotation.AppAction;
 import org.openmrs.module.kenyaui.validator.ValidatingCommandObject;
@@ -68,7 +69,7 @@ public class MergePatientsFragmentController {
 		ui.validate(form, form, null);
 
 		try {
-			Context.getPatientService().mergePatients(form.getPatient1(), form.getPatient2());
+			Context.getService(KenyaDqService.class).mergePatients(form.getPatient1(), form.getPatient2());
 
 			kenyaUi.notifySuccess(session, "Patients merged successfully");
 		}
