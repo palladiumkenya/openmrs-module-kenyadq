@@ -61,4 +61,32 @@
 		<property name="apps"><set><ref bean="kenyadq.app.dataqual" /></set></property>
 	</bean>
 
+	<!-- ===================== Module service ===================== -->
+
+	<bean id="kenyaDqService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="target">
+			<bean class="org.openmrs.module.kenyadq.api.impl.KenyaDqServiceImpl" />
+		</property>
+		<property name="preInterceptors">
+			<ref bean="serviceInterceptors" />
+		</property>
+		<property name="transactionAttributeSource">
+			<ref bean="transactionAttributeSource" />
+		</property>
+	</bean>
+
+	<!-- Register service with OpenMRS -->
+
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list>
+				<value>org.openmrs.module.kenyadq.api.KenyaDqService</value>
+				<ref local="kenyaDqService"/>
+			</list>
+		</property>
+	</bean>
+
 </beans>
