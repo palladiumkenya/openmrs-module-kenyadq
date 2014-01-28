@@ -3,7 +3,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>kenyadq</artifactId>
-	<version>0.2.7</version>
+	<version>0.2.8-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 	<name>KenyaDQ</name>
