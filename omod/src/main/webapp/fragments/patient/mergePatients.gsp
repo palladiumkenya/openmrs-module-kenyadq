@@ -5,7 +5,7 @@
 <form id="merge-patients-form" method="post" action="${ ui.actionLink("kenyadq", "patient/mergePatients", "merge") }">
 
 	<div class="ke-panel-controls">
-		<button type="button" class="ke-compact" onclick="switchPatients()"><img src="${ ui.resourceLink("kenyaui", "images/glyphs/switch.png") }" /></button>
+		<button type="button" class="ke-compact" onclick="switchPatients()"><img src="${ ui.resourceLink("kenyaui", "images/glyphs/switch.png") }" /> Switch</button>
 	</div>
 
 	<div class="ke-panel-content">
