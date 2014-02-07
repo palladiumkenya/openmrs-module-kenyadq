@@ -14,25 +14,15 @@
 
 package org.openmrs.module.kenyadq.page.controller.dataqual;
 
-import org.openmrs.Patient;
 import org.openmrs.module.kenyadq.DqConstants;
 import org.openmrs.module.kenyaui.annotation.AppPage;
-import org.openmrs.ui.framework.page.PageModel;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * Merge patients page
+ * Find duplicate patients page
  */
 @AppPage(DqConstants.APP_DATAQUALITY)
-public class MergePatientsPageController {
+public class FindDuplicatePatientsPageController {
 
-	public void controller(@RequestParam(value = "patient1", required = false) Patient patient1,
-						   @RequestParam(value = "patient2", required = false) Patient patient2,
-						   @RequestParam("returnUrl") String returnUrl,
-						   PageModel model) {
-
-		model.addAttribute("patient1", patient1);
-		model.addAttribute("patient2", patient2);
-		model.addAttribute("returnUrl", returnUrl);
+	public void controller() {
 	}
 }

@@ -30,6 +30,7 @@ import org.openmrs.module.kenyaui.form.ValidatingCommandObject;
 import org.openmrs.ui.framework.SimpleObject;
 import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.annotation.BindParams;
+import org.openmrs.ui.framework.annotation.FragmentParam;
 import org.openmrs.ui.framework.annotation.MethodParam;
 import org.openmrs.ui.framework.annotation.SpringBean;
 import org.openmrs.ui.framework.fragment.FragmentModel;
@@ -48,10 +49,12 @@ public class MergePatientsFragmentController {
 
 	protected static final Log log = LogFactory.getLog(MergePatientsFragmentController.class);
 
-	public void controller(@RequestParam(required = false, value = "returnUrl") String returnUrl,
+	public void controller(@FragmentParam(value = "patient1", required = false) Patient patient1,
+						   @FragmentParam(value = "patient2", required = false) Patient patient2,
+						   @FragmentParam(value = "returnUrl") String returnUrl,
 						   FragmentModel model) {
 
-		model.addAttribute("command", new MergePatientsForm());
+		model.addAttribute("command", new MergePatientsForm(patient1, patient2));
 		model.addAttribute("returnUrl", returnUrl);
 	}
 
@@ -148,7 +151,7 @@ public class MergePatientsFragmentController {
 	 * @return the form
 	 */
 	public MergePatientsForm newMergePatientsForm() {
-		return new MergePatientsForm();
+		return new MergePatientsForm(null, null);
 	}
 
 	/**
@@ -159,6 +162,11 @@ public class MergePatientsFragmentController {
 		private Patient patient1;
 
 		private Patient patient2;
+
+		public MergePatientsForm(Patient patient1, Patient patient2) {
+			this.patient1 = patient1;
+			this.patient2 = patient2;
+		}
 
 		@Override
 		public void validate(Object o, Errors errors) {

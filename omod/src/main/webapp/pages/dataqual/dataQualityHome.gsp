@@ -1,14 +1,13 @@
 <%
 	ui.decorateWith("kenyaemr", "standardPage", [ layout: "sidebar" ])
+
+	def menuItems = [
+			[ label: "Merge patient records", iconProvider: "kenyadq", icon: "buttons/patient_merge.png", href: ui.pageLink("kenyadq", "dataqual/findDuplicatePatients") ]
+	]
 %>
 
 <div class="ke-page-sidebar">
-	${ ui.includeFragment("kenyaui", "widget/panelMenu", [
-			heading: "Tasks",
-			items: [
-					[ iconProvider: "kenyadq", icon: "buttons/patient_merge.png", label: "Merge duplicate patients", href: ui.pageLink("kenyadq", "dataqual/mergePatients", [ returnUrl: ui.thisUrl() ]) ]
-			]
-	]) }
+	${ ui.includeFragment("kenyaui", "widget/panelMenu", [ heading: "Tasks", items: menuItems ]) }
 </div>
 
 <div class="ke-page-content">

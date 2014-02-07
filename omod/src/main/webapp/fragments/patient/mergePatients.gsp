@@ -133,6 +133,16 @@
 				location.href = '${ returnUrl }';
 			}
 		});
+
+		var initialPatient1 = jq('#patient1-select').val();
+		var initialPatient2 = jq('#patient2-select').val();
+
+		if (initialPatient1) {
+			updatePatientSummary(initialPatient1, '1');
+		}
+		if (initialPatient2) {
+			updatePatientSummary(initialPatient2, '2');
+		}
 	});
 
 	/**
