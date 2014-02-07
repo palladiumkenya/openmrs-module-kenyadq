@@ -21,6 +21,7 @@ import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PersonAttribute;
 import org.openmrs.PersonName;
+import org.openmrs.api.IdentifierNotUniqueException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.kenyadq.DqConstants;
 import org.openmrs.module.kenyadq.api.KenyaDqService;
@@ -76,10 +77,12 @@ public class MergePatientsFragmentController {
 
 			kenyaUi.notifySuccess(session, "Patients merged successfully");
 		}
+		catch (IdentifierNotUniqueException ex) {
+			return new FailureResult(ex.getMessage());
+		}
 		catch (Exception ex) {
 			log.error("Unable to merge patients #" + form.getPatient1().getId() + " and #" + form.getPatient2().getId(), ex);
-
-			new FailureResult("Unable to merge");
+			return new FailureResult("Unable to merge");
 		}
 
 		return SimpleObject.fromObject(form.getPatient1(), ui, "patientId");
