@@ -17,7 +17,7 @@
  */
 kenyaemrApp.controller('DuplicatePatients', ['$scope', '$http', function($scope, $http) {
 
-	$scope.byIdentifier = true;
+	$scope.byIdentifier = false;
 	$scope.byFamilyName = true;
 	$scope.byGivenName = true;
 	$scope.byGender = true;
