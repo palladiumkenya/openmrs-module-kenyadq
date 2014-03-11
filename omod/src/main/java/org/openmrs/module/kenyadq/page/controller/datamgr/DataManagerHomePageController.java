@@ -12,22 +12,17 @@
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 
-package org.openmrs.module.kenyadq;
+package org.openmrs.module.kenyadq.page.controller.datamgr;
+
+import org.openmrs.module.kenyadq.DqConstants;
+import org.openmrs.module.kenyaui.annotation.AppPage;
 
 /**
- * Constants used by KenyaDQ
+ * Data manager home page
  */
-public class DqConstants {
+@AppPage(DqConstants.APP_DATAMANAGER)
+public class DataManagerHomePageController {
 
-	/**
-	 * Module ID
-	 */
-	public static final String MODULE_ID = "kenyadq";
-
-	/**
-	 * App IDs
-	 */
-	public static final String APP_DATAQUALITY = MODULE_ID + ".dataQuality";
-
-	public static final String APP_DATAMANAGER = MODULE_ID + ".dataManager";
+	public void controller() {
+	}
 }

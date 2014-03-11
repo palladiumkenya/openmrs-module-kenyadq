@@ -31,6 +31,14 @@
 		<constructor-arg value="Data Quality" />
 		<constructor-arg value="kenyadq/dataqual/dataQualityHome.page" />
 		<constructor-arg value="kenyadq:apps/dataqual.png" />
+		<constructor-arg value="525" />
+	</bean>
+
+	<bean id="kenyadq.app.datamgr" factory-bean="kenyacore.appFactoryBean" factory-method="createInstance">
+		<constructor-arg value="kenyadq.dataManager" />
+		<constructor-arg value="Data Manager" />
+		<constructor-arg value="kenyadq/datamgr/dataManagerHome.page" />
+		<constructor-arg value="kenyadq:apps/datamgr.png" />
 		<constructor-arg value="550" />
 	</bean>
 
