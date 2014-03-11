@@ -1,11 +1,11 @@
 <%
 	ui.decorateWith("kenyaemr", "standardPage", [ layout: "sidebar" ])
 
-	ui.includeJavascript("kenyadq", "controllers/dataqual.js")
+	ui.includeJavascript("kenyadq", "controllers/merge.js")
 
 	def menuItems = [
-			[ label: "Select patients manually", iconProvider: "kenyadq", icon: "buttons/patient_merge.png", href: ui.pageLink("kenyadq", "dataqual/mergePatients", [ returnUrl: ui.thisUrl() ]) ],
-			[ label: "Back to home", iconProvider: "kenyaui", icon: "buttons/back.png", label: "Back to home", href: ui.pageLink("kenyadq", "dataqual/dataQualityHome") ]
+			[ label: "Select patients manually", iconProvider: "kenyadq", icon: "buttons/patient_merge.png", href: ui.pageLink("kenyadq", "datamgr/mergePatients", [ returnUrl: ui.thisUrl() ]) ],
+			[ label: "Back to home", iconProvider: "kenyaui", icon: "buttons/back.png", label: "Back to home", href: ui.pageLink("kenyadq", "datamgr/dataQualityHome") ]
 	]
 %>
 
@@ -18,7 +18,7 @@
 			});
 
 			if (patientIds.length == 2) {
-				ui.navigate('kenyadq', 'dataqual/mergePatients', { patient1: patientIds[0], patient2: patientIds[1], returnUrl: location.href });
+				ui.navigate('kenyadq', 'datamgr/mergePatients', { patient1: patientIds[0], patient2: patientIds[1], returnUrl: location.href });
 			}
 			else {
 				kenyaui.notifyError('Please select exactly 2 patients to merge');
