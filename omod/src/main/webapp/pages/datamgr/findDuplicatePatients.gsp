@@ -5,7 +5,7 @@
 
 	def menuItems = [
 			[ label: "Select patients manually", iconProvider: "kenyadq", icon: "buttons/patient_merge.png", href: ui.pageLink("kenyadq", "datamgr/mergePatients", [ returnUrl: ui.thisUrl() ]) ],
-			[ label: "Back to home", iconProvider: "kenyaui", icon: "buttons/back.png", label: "Back to home", href: ui.pageLink("kenyadq", "dataqual/dataQualityHome") ]
+			[ label: "Back to home", iconProvider: "kenyaui", icon: "buttons/back.png", label: "Back to home", href: ui.pageLink("kenyadq", "datamgr/dataManagerHome") ]
 	]
 %>
 
