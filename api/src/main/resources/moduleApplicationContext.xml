@@ -10,6 +10,7 @@
 		<property name="commonReports">
 			<set>
 				<ref bean="kenyadq.common.report.missingMaritalStatus" />
+                <ref bean="kenyadq.common.report.rdqaReport" />
 			</set>
 		</property>
 		<property name="programReports">
@@ -66,6 +67,17 @@
 		<property name="calculation" value="org.openmrs.module.kenyadq.calculation.hiv.MissingHivConfirmedDateCalculation" />
 		<property name="apps"><set><ref bean="kenyadq.app.dataqual" /></set></property>
 	</bean>
+
+    <!-- =========================== RDQA Reports =============================-->
+    <bean id="kenyadq.common.report.rdqaReport" class="org.openmrs.module.kenyacore.report.CohortReportDescriptor">
+        <property name="targetUuid" value="ed1cfbf2-64c6-11e4-86ed-10c37b209d8a" />
+        <property name="name" value="RDQA Report" />
+        <property name="description" value="Report for Routine Data Quality Analysis" />
+        <property name="apps">
+            <set>
+                <ref bean="kenyaemr.app.reports" />
+            </set></property>
+    </bean>
 
 	<!-- ===================== Module service ===================== -->
 
