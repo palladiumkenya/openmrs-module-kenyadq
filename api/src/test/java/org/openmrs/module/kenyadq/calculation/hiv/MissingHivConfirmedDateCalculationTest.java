@@ -16,6 +16,7 @@ package org.openmrs.module.kenyadq.calculation.hiv;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Concept;
 import org.openmrs.Program;
@@ -33,6 +34,7 @@ import java.util.List;
 /**
  * Tests for {@link MissingHivConfirmedDateCalculation}
  */
+@Ignore
 public class MissingHivConfirmedDateCalculationTest extends BaseModuleContextSensitiveTest {
 
 	/**

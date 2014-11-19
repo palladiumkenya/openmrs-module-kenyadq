@@ -21,6 +21,7 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.kenyadq.api.KenyaDqService;
+import org.openmrs.module.kenyadq.api.db.KenyaDqDao;
 import org.openmrs.serialization.SerializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,6 +40,7 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 	@Autowired
 	private PatientService patientService;
 
+	private KenyaDqDao dao;
 	/**
 	 * @see org.openmrs.module.kenyadq.api.KenyaDqService#mergePatients(org.openmrs.Patient, org.openmrs.Patient)
 	 */
@@ -88,6 +90,16 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 		}
 	}
 
+	@Override
+	public List<Object> executeSqlQuery(String query, Map<String, Object> substitutions) {
+		return dao.executeSqlQuery(query, substitutions);
+	}
+
+	@Override
+	public List<Object> executeHqlQuery(String query, Map<String, Object> substitutions) {
+		return dao.executeHqlQuery(query, substitutions);
+	}
+
 	/**
 	 * Helper method to get all of a patient's identifiers organized by type
 	 * @param patient the patient
@@ -108,5 +120,13 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 		}
 
 		return ids;
+	}
+
+	public KenyaDqDao getDao() {
+		return dao;
+	}
+
+	public void setDao(KenyaDqDao dao) {
+		this.dao = dao;
 	}
 }

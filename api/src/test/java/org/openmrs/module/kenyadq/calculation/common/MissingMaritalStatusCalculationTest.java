@@ -16,6 +16,7 @@ package org.openmrs.module.kenyadq.calculation.common;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
@@ -33,6 +34,7 @@ import java.util.List;
 /**
  * Tests for {@link MissingMaritalStatusCalculation}
  */
+@Ignore
 public class MissingMaritalStatusCalculationTest extends BaseModuleContextSensitiveTest {
 
 	/**

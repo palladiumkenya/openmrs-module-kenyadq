@@ -46,6 +46,7 @@
 		<reportingVersion>0.9.2.1</reportingVersion>
 		<serializationxstreamVersion>0.2.7</serializationxstreamVersion>
 		<uiframeworkVersion>3.2.2</uiframeworkVersion>
+        <kenyaemrVersion>14.2-SNAPSHOT</kenyaemrVersion>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -131,6 +132,12 @@
 				<version>${uiframeworkVersion}</version>
 				<scope>provided</scope>
 			</dependency>
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>kenyaemr-api</artifactId>
+                <version>${kenyaemrVersion}</version>
+                <scope>provided</scope>
+            </dependency>
 
 			<!-- End OpenMRS modules -->
 

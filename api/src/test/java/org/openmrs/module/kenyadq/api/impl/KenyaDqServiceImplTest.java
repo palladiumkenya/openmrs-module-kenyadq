@@ -15,6 +15,7 @@
 package org.openmrs.module.kenyadq.api.impl;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifierType;
@@ -29,6 +30,7 @@ import static org.hamcrest.Matchers.*;
 /**
  * Tests for {@link KenyaDqServiceImpl}
  */
+@Ignore
 public class KenyaDqServiceImplTest extends BaseModuleContextSensitiveTest {
 
 	@Autowired
