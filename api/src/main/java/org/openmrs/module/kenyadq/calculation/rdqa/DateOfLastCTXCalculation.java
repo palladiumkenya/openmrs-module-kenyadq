@@ -27,7 +27,6 @@ import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.calculation.result.SimpleResult;
 import org.openmrs.module.kenyacore.calculation.AbstractPatientCalculation;
-import org.openmrs.module.kenyaemr.Dictionary;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,10 +40,10 @@ import java.util.Map;
  */
 public class DateOfLastCTXCalculation extends AbstractPatientCalculation {
 
-	Concept ctxConcept = Dictionary.getConcept(Dictionary.COTRIMOXAZOLE_DISPENSED);
-	Concept yes = Dictionary.getConcept(Dictionary.YES);
-	Concept medicationOrder = Dictionary.getConcept(Dictionary.MEDICATION_ORDERS);
-	Concept sulphurCtx = Dictionary.getConcept(Dictionary.SULFAMETHOXAZOLE_TRIMETHOPRIM);
+	Concept ctxConcept = Context.getConceptService().getConceptByUuid("162229AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+	Concept yes = Context.getConceptService().getConceptByUuid("1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+	Concept medicationOrder = Context.getConceptService().getConceptByUuid("1282AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+	Concept sulphurCtx = Context.getConceptService().getConceptByUuid("105281AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 
 	@Override
 	public CalculationResultMap evaluate(Collection<Integer> cohort, Map<String, Object> parameterValues, PatientCalculationContext context) {

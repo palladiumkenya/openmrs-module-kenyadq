@@ -27,6 +27,7 @@ import org.openmrs.module.kenyadq.calculation.rdqa.DateOfDeathCalculation;
 import org.openmrs.module.kenyadq.calculation.rdqa.DateOfLastCTXCalculation;
 import org.openmrs.module.kenyadq.calculation.rdqa.PatientCheckOutStatusCalculation;
 import org.openmrs.module.kenyadq.calculation.rdqa.PatientLastEncounterDateCalculation;
+import org.openmrs.module.kenyadq.calculation.rdqa.PatientProgramEnrollmentCalculation;
 import org.openmrs.module.kenyadq.calculation.rdqa.ValueAtDateOfOtherPatientCalculationCalculation;
 import org.openmrs.module.kenyadq.calculation.rdqa.VisitsForAPatientCalculation;
 import org.openmrs.module.kenyadq.calculation.rdqa.WeightAtArtStartDateCalculation;
@@ -34,7 +35,10 @@ import org.openmrs.module.kenyadq.converter.ConceptNamesDataConverter;
 import org.openmrs.module.kenyadq.converter.ObsDatetimeConverter;
 import org.openmrs.module.kenyadq.converter.ObsValueDatetimeConverter;
 import org.openmrs.module.kenyadq.converter.ObsValueNumericConverter;
+import org.openmrs.module.kenyadq.converter.PatientProgramEnrollmentConverter;
+import org.openmrs.module.kenyadq.converter.PatientProgramEnrollmentDateConverter;
 import org.openmrs.module.kenyadq.converter.WHOStageDataConverter;
+import org.openmrs.module.kenyadq.reporting.cohort.definition.RDQACohortDefinition;
 import org.openmrs.module.kenyaemr.Dictionary;
 import org.openmrs.module.kenyaemr.calculation.library.hiv.art.CurrentArtRegimenCalculation;
 import org.openmrs.module.kenyaemr.calculation.library.hiv.art.InitialArtStartDateCalculation;
@@ -44,7 +48,6 @@ import org.openmrs.module.kenyaemr.metadata.HivMetadata;
 import org.openmrs.module.kenyaemr.reporting.data.converter.CalculationResultConverter;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
@@ -93,6 +96,9 @@ public class RDQAReportBuilder extends AbstractCohortReportBuilder {
 		dsd.addColumn("Name", nameDef, "");
         dsd.addColumn("Sex", new GenderDataDefinition(), "");
 		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), "", new BirthdateConverter(DATE_FORMAT));
+		dsd.addColumn("Enrollment into Program", new CalculationDataDefinition("Enrollment into Program", new PatientProgramEnrollmentCalculation()), "", new PatientProgramEnrollmentConverter());
+		dsd.addColumn("Enrollment Date", new CalculationDataDefinition("Enrollment Date", new PatientProgramEnrollmentCalculation()), "", new PatientProgramEnrollmentDateConverter());
+
 		dsd.addColumn("Art Start Date", new CalculationDataDefinition("Art Start Date", new InitialArtStartDateCalculation()), "", new CalculationResultConverter());
 		dsd.addColumn("Entry Point", new ObsForPersonDataDefinition("Entry Point", TimeQualifier.LAST, Dictionary.getConcept(Dictionary.METHOD_OF_ENROLLMENT), null, null), "", new ConceptNamesDataConverter());
 		dsd.addColumn("CD4 at Art Start", new CalculationDataDefinition("CD4 at Art Start", new CD4AtArtStartDateCalculation()), "", new CalculationResultConverter());
@@ -136,19 +142,10 @@ public class RDQAReportBuilder extends AbstractCohortReportBuilder {
 
 	@Override
 	protected Mapped<CohortDefinition> buildCohort(CohortReportDescriptor descriptor, PatientDataSetDefinition dsd) {
-
-        //try sql cohort methods within kenya emr
-        String sql ="select   e.patient_id  " +
-                "  from encounter e  " +
-                "  inner join person p  " +
-                "  on p.person_id=e.patient_id   " +
-                "    where e.voided = 0  " +
-                "    and p.voided=0   " +
-                "    and DATE(e.encounter_datetime) = '2005-06-15'  ";
-
-        CohortDefinition cd = new SqlCohortDefinition(sql);
-        cd.setName("Patients who attended during a particular period");
-
-		return ReportUtils.map(cd, "");
+		CohortDefinition cd = new RDQACohortDefinition();
+        cd.setName("RDQA Patients");
+		return ReportUtils.map(cd,"");
 	}
+
+
 }

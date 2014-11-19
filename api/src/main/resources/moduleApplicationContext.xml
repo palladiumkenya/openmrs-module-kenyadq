@@ -86,7 +86,13 @@
 			<ref bean="transactionManager" />
 		</property>
 		<property name="target">
-			<bean class="org.openmrs.module.kenyadq.api.impl.KenyaDqServiceImpl" />
+			<bean class="org.openmrs.module.kenyadq.api.impl.KenyaDqServiceImpl" >
+                <property name="dao">
+                    <bean class="org.openmrs.module.kenyadq.api.db.impl.KenyaDqHibernateDao">
+                        <property name="sessionFactory"><ref bean="sessionFactory"/></property>
+                    </bean>
+                </property>
+            </bean>
 		</property>
 		<property name="preInterceptors">
 			<ref bean="serviceInterceptors" />
@@ -95,6 +101,7 @@
 			<ref bean="transactionAttributeSource" />
 		</property>
 	</bean>
+
 
 	<!-- Register service with OpenMRS -->
 

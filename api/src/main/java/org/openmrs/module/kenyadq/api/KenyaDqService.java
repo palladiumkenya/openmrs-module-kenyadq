@@ -19,6 +19,9 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Module service interface
  */
@@ -32,4 +35,6 @@ public interface KenyaDqService extends OpenmrsService {
 	 * @param notPreferred the non-preferred patient
 	 */
 	void mergePatients(Patient preferred, Patient notPreferred) throws APIException;
+	public List<Object> executeSqlQuery(String query, Map<String, Object> substitutions);
+	public List<Object> executeHqlQuery(String query, Map<String, Object> substitutions);
 }

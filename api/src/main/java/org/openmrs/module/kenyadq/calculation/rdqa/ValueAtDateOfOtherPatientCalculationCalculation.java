@@ -49,7 +49,6 @@ public class ValueAtDateOfOtherPatientCalculationCalculation extends AbstractPat
 
 		CalculationResultMap dataForOtherCalculation = evaluateBaseCalculation(cohort, context);
 		CalculationResultMap questionEvaluationData = evaluateQuestion(cohort, parameterValues, context);
-		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++=================================================================================================================================");
 
 		CalculationResultMap ret = new CalculationResultMap();
 
@@ -74,7 +73,6 @@ public class ValueAtDateOfOtherPatientCalculationCalculation extends AbstractPat
 				}
 			}
 			ret.put(ptid, new SimpleResult(ans, this));
-
 		}
 
 		return ret;

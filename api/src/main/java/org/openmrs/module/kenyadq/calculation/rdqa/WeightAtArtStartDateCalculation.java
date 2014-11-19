@@ -15,13 +15,13 @@ package org.openmrs.module.kenyadq.calculation.rdqa;
 
 import org.openmrs.Concept;
 import org.openmrs.Obs;
+import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.calculation.result.ListResult;
 import org.openmrs.calculation.result.SimpleResult;
 import org.openmrs.module.kenyacore.calculation.AbstractPatientCalculation;
 import org.openmrs.module.kenyacore.calculation.CalculationUtils;
-import org.openmrs.module.kenyaemr.Dictionary;
 import org.openmrs.module.kenyaemr.calculation.library.hiv.art.InitialArtStartDateCalculation;
 import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.data.person.definition.ObsForPersonDataDefinition;
@@ -74,8 +74,8 @@ public class WeightAtArtStartDateCalculation extends AbstractPatientCalculation 
 	}
 
 	private CalculationResultMap evaluateQuestion(Collection<Integer> cohort, Map<String, Object> parameterValues, PatientCalculationContext context){
-		Concept cd4Concept = Dictionary.getConcept(Dictionary.WEIGHT_KG);
-		ObsForPersonDataDefinition definition = new ObsForPersonDataDefinition("Observations for Weight", TimeQualifier.ANY, cd4Concept, null, null);
+		Concept weightConcept = Context.getConceptService().getConceptByUuid("5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		ObsForPersonDataDefinition definition = new ObsForPersonDataDefinition("Observations for Weight", TimeQualifier.ANY, weightConcept, null, null);
 		return CalculationUtils.evaluateWithReporting(definition, cohort, parameterValues, null, context);
 	}
 
