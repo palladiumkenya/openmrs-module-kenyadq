@@ -2,6 +2,7 @@ package org.openmrs.module.kenyadq.converter;
 
 import org.openmrs.PatientProgram;
 import org.openmrs.calculation.result.SimpleResult;
+import org.openmrs.module.kenyadq.utils.RDQAReportUtils;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
 import java.util.Date;
@@ -25,9 +26,9 @@ public class PatientProgramEnrollmentDateConverter implements DataConverter {
 		List<PatientProgram> result = (List<PatientProgram>)baseResult.getValue();
 
 		if (result.size() == 1)
-			return result.get(0).getDateEnrolled();
+			return RDQAReportUtils.formatdates(result.get(0).getDateEnrolled(), RDQAReportUtils.DATE_FORMAT);
 
-		return hasHivProgram(result);
+		return RDQAReportUtils.formatdates(hasHivProgram(result), RDQAReportUtils.DATE_FORMAT);
 	}
 
 	@Override
@@ -37,7 +38,7 @@ public class PatientProgramEnrollmentDateConverter implements DataConverter {
 
 	@Override
 	public Class<?> getDataType() {
-		return Date.class;
+		return String.class;
 	}
 
 	private Date hasHivProgram(List<PatientProgram> enrolledPrograms){

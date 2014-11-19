@@ -1,6 +1,7 @@
 package org.openmrs.module.kenyadq.converter;
 
 import org.openmrs.Obs;
+import org.openmrs.module.kenyadq.utils.RDQAReportUtils;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
 import java.util.Date;
@@ -16,7 +17,7 @@ public class ObsDatetimeConverter implements DataConverter {
 		if (o == null)
 			return null;
 
-		return o.getObsDatetime();
+		return RDQAReportUtils.formatdates(o.getObsDatetime(), RDQAReportUtils.DATE_FORMAT);
 	}
 
 	@Override
@@ -26,6 +27,6 @@ public class ObsDatetimeConverter implements DataConverter {
 
 	@Override
 	public Class<?> getDataType() {
-		return Date.class;
+		return String.class;
 	}
 }
