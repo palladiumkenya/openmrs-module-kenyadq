@@ -37,4 +37,6 @@ public interface KenyaDqService extends OpenmrsService {
 	void mergePatients(Patient preferred, Patient notPreferred) throws APIException;
 	public List<Object> executeSqlQuery(String query, Map<String, Object> substitutions);
 	public List<Object> executeHqlQuery(String query, Map<String, Object> substitutions);
+
+	public byte[] downloadAnalysisFile();
 }
