@@ -3,7 +3,8 @@
 
     def menuItems = [
             [ label: "Merge patient records", iconProvider: "kenyadq", icon: "buttons/patient_merge.png", href: ui.pageLink("kenyadq", "datamgr/findDuplicatePatients") ],
-                    [ label: "Download analysis file", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadAnalysisFile") ]
+                    [ label: "Download analysis file", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadAnalysisFile") ],
+            [ label: "Download data dictionary", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadDataDictionary") ]
     ]
 %>
 

@@ -17,6 +17,7 @@ package org.openmrs.module.kenyadq.api.impl;
 import au.com.bytecode.opencsv.CSVWriter;
 import org.openmrs.Concept;
 import org.openmrs.ConceptDatatype;
+import org.openmrs.ConceptDescription;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
@@ -159,8 +160,46 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 			}
 			writer.writeNext(row);
 		}
-		String rep = stringWriter.toString();
-		return rep.getBytes();
+		String csvString = stringWriter.toString();
+		return csvString.getBytes();
+	}
+
+	public byte[] downloadDataDictionary() {
+		StringWriter stringWriter = new StringWriter();
+		CSVWriter writer = new CSVWriter(stringWriter);
+
+		String[] header = new String[4];
+		header[0] = "concept_id";
+		header[1] = "concept_name";
+		header[2] = "concept_description";
+		header[3] = "concept_type";
+		writer.writeNext(header);
+		String csvString = null;
+try {
+	List<Concept> concepts = conceptService.getAllConcepts();
+	List<Integer> obsConceptIds = getConceptIdsWithObservations();
+	for (Concept concept : concepts) {
+		if (!obsConceptIds.contains(concept.getId())) {
+			continue;
+		}
+		String[] row = new String[4];
+		row[0] = concept.getId().toString();
+		row[1] = concept.getPreferredName(CoreConstants.LOCALE).getName();
+		String description = "";
+		ConceptDescription cd = concept.getDescription(CoreConstants.LOCALE);
+		if (cd != null) {
+			description = cd.getDescription();
+		}
+		row[2] =description;
+		row[3] = concept.getDatatype().getName();
+		writer.writeNext(row);
+	}
+	csvString = stringWriter.toString();
+}   catch(Exception ex) {
+	System.out.println(ex.getMessage());
+	ex.printStackTrace();
+}
+		return csvString.getBytes();
 	}
 
 	private void initColumnHeaders(List<Object> columnHeaders) {

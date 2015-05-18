@@ -39,4 +39,6 @@ public interface KenyaDqService extends OpenmrsService {
 	public List<Object> executeHqlQuery(String query, Map<String, Object> substitutions);
 
 	public byte[] downloadAnalysisFile();
+
+	public byte[] downloadDataDictionary();
 }
