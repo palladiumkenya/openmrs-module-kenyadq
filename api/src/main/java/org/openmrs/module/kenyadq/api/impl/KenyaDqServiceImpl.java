@@ -14,7 +14,10 @@
 
 package org.openmrs.module.kenyadq.api.impl;
 
+import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.ConceptDatatype;
 import org.openmrs.ConceptDescription;
@@ -31,8 +34,12 @@ import org.openmrs.module.kenyadq.api.db.KenyaDqDao;
 import org.openmrs.serialization.SerializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -51,6 +58,8 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 	private ConceptService conceptService;
 
 	private KenyaDqDao dao;
+
+	protected static final Log log = LogFactory.getLog(KenyaDqServiceImpl.class);
 
 	/**
 	 * @see org.openmrs.module.kenyadq.api.KenyaDqService#mergePatients(org.openmrs.Patient, org.openmrs.Patient)
@@ -175,30 +184,29 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 		header[3] = "concept_type";
 		writer.writeNext(header);
 		String csvString = null;
-try {
-	List<Concept> concepts = conceptService.getAllConcepts();
-	List<Integer> obsConceptIds = getConceptIdsWithObservations();
-	for (Concept concept : concepts) {
-		if (!obsConceptIds.contains(concept.getId())) {
-			continue;
+		try {
+			List<Concept> concepts = conceptService.getAllConcepts();
+			List<String> kenyaEmrConceptUuids = getKenyaEmrConceptUuids();
+			for (Concept concept : concepts) {
+				if (!kenyaEmrConceptUuids.contains(concept.getUuid())) {
+					continue;
+				}
+				String[] row = new String[4];
+				row[0] = concept.getId().toString();
+				row[1] = concept.getPreferredName(CoreConstants.LOCALE).getName();
+				String description = "";
+				ConceptDescription cd = concept.getDescription(CoreConstants.LOCALE);
+				if (cd != null) {
+					description = cd.getDescription();
+				}
+				row[2] = description;
+				row[3] = concept.getDatatype().getName();
+				writer.writeNext(row);
+			}
+			csvString = stringWriter.toString();
+		} catch (Exception ex) {
+			throw new RuntimeException("Could not download data dictionary.");
 		}
-		String[] row = new String[4];
-		row[0] = concept.getId().toString();
-		row[1] = concept.getPreferredName(CoreConstants.LOCALE).getName();
-		String description = "";
-		ConceptDescription cd = concept.getDescription(CoreConstants.LOCALE);
-		if (cd != null) {
-			description = cd.getDescription();
-		}
-		row[2] =description;
-		row[3] = concept.getDatatype().getName();
-		writer.writeNext(row);
-	}
-	csvString = stringWriter.toString();
-}   catch(Exception ex) {
-	System.out.println(ex.getMessage());
-	ex.printStackTrace();
-}
 		return csvString.getBytes();
 	}
 
@@ -255,10 +263,10 @@ try {
 
 	private String dynamic(List<Object> columnHeaders) {
 		List<Concept> concepts = conceptService.getAllConcepts();
-		List<Integer> obsConceptIds = getConceptIdsWithObservations();
+		List<String> kenyaEmrConceptUuids = getKenyaEmrConceptUuids();
 		String dynamic = "";
 		for (Concept concept : concepts) {
-			if (!obsConceptIds.contains(concept.getId())) {
+			if (!kenyaEmrConceptUuids.contains(concept.getUuid())) {
 				continue;
 			}
 			ConceptDatatype cd = concept.getDatatype();
@@ -318,15 +326,42 @@ try {
 		return from;
 	}
 
-	private List<Integer> getConceptIdsWithObservations() {
-		List<Integer> obsConceptIds = new ArrayList<Integer>();
-		String query = "SELECT DISTINCT concept_id FROM obs ORDER BY concept_id ASC";
-		Map<String, Object> substitutions = new HashMap<String, Object>();
-		List<Object> resultList = dao.executeSqlQuery(query, substitutions);
-		for (Object object : resultList) {
-			obsConceptIds.add((Integer) object);
+	private List<String> getKenyaEmrConceptUuids() {
+		List<String> conceptUuids = new ArrayList<String>();
+		CSVReader reader = null;
+		InputStream in = null;
+		try {
+			in = getClass().getClassLoader().getResourceAsStream("metadata/kemr_concepts_2015-05-27.csv");
+			reader = new CSVReader(new InputStreamReader(in));
+			String[] nextLine;
+			while ((nextLine = reader.readNext()) != null) {
+				if (nextLine.length > 0) {
+					String conceptUuid = nextLine[0];
+					if (conceptUuid != null && !conceptUuids.contains(conceptUuid)) {
+						conceptUuids.add(conceptUuid);
+					}
+				}
+			}
+		} catch (Exception ex) {
+			throw new RuntimeException("Could not read KenyaEMR concepts metadata file.");
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (Exception ex) {
+					log.error(ex.getMessage());
+				}
+			}
+			if (in != null) {
+				try {
+					in.close();
+				} catch (Exception ex) {
+					log.error(ex.getMessage());
+				}
+			}
 		}
-		return obsConceptIds;
+		Collections.sort(conceptUuids);
+		return conceptUuids;
 	}
 
 	private String trimTraillingComma(String untrimmed) {
