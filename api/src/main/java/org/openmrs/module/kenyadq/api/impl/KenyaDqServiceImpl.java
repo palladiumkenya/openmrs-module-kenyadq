@@ -226,6 +226,19 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 		columnHeaders.add("dead");
 		columnHeaders.add("death_date");
 		columnHeaders.add("cause_of_death");
+//		columnHeaders.add("telephone");
+		columnHeaders.add("postal_address");
+		columnHeaders.add("school_employer_address");
+		columnHeaders.add("location");
+		columnHeaders.add("village_estate");
+		columnHeaders.add("county");
+		columnHeaders.add("district");
+		columnHeaders.add("sub_location");
+		columnHeaders.add("landmark");
+//		columnHeaders.add("subchief");
+		columnHeaders.add("province");
+		columnHeaders.add("division");
+		columnHeaders.add("house_no");
 		columnHeaders.add("patient_voided");
 		columnHeaders.add("visit_uuid");
 		columnHeaders.add("visit_type");
@@ -252,6 +265,19 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 						"\tp.dead,\n" +
 						"\tp.death_date,\n" +
 						"\tp.cause_of_death,\n" +
+//						"\ta.address1 AS telephone,\n" +
+						"\ta.address1 AS postal_address,\n" +
+						"\ta.address3 AS school_employer_address,\n" +
+						"\ta.address6 AS location,\n" +
+						"\ta.city_village AS village_estate,\n" +
+						"\ta.country AS county,\n" +
+						"\ta.county_district AS district,\n" +
+						"\ta.address5 AS sub_location,\n" +
+						"\ta.address2 AS landmark,\n" +
+//						"\ta.address5 AS subchief,\n" +
+						"\ta.state_province AS province,\n" +
+						"\ta.address4 AS division,\n" +
+						"\ta.postal_code AS house_no,\n" +
 						"\tp.voided AS patient_voided,\n" +
 						"\tCAST(v.uuid AS CHAR) AS visit_uuid,\n" +
 						"\tvt.`name` AS visit_type,\n" +
@@ -311,6 +337,8 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 						"\tperson p ON e.patient_id = p.person_id\n" +
 						"INNER JOIN\n" +
 						"\tperson_name n ON p.person_id = n.person_id\n" +
+						"INNER JOIN\n" +
+						"\tperson_address a ON p.person_id = a.person_id\n" +
 						"INNER JOIN\n" +
 						"\tvisit v ON e.visit_id = v.visit_id\n" +
 						"INNER JOIN\n" +
