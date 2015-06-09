@@ -186,7 +186,7 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 		String csvString = null;
 		try {
 			List<Concept> concepts = conceptService.getAllConcepts();
-			List<String> kenyaEmrConceptUuids = getKenyaEmrConceptUuids();
+			List<String> kenyaEmrConceptUuids = getKenyaEmrConceptUuids("answer_concepts_2015-06-08.csv");
 			for (Concept concept : concepts) {
 				if (!kenyaEmrConceptUuids.contains(concept.getUuid())) {
 					continue;
@@ -289,7 +289,7 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 
 	private String dynamic(List<Object> columnHeaders) {
 		List<Concept> concepts = conceptService.getAllConcepts();
-		List<String> kenyaEmrConceptUuids = getKenyaEmrConceptUuids();
+		List<String> kenyaEmrConceptUuids = getKenyaEmrConceptUuids("question_concepts_2015-05-27.csv");
 		String dynamic = "";
 		for (Concept concept : concepts) {
 			if (!kenyaEmrConceptUuids.contains(concept.getUuid())) {
@@ -354,12 +354,12 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 		return from;
 	}
 
-	private List<String> getKenyaEmrConceptUuids() {
+	private List<String> getKenyaEmrConceptUuids(String fileName) {
 		List<String> conceptUuids = new ArrayList<String>();
 		CSVReader reader = null;
 		InputStream in = null;
 		try {
-			in = getClass().getClassLoader().getResourceAsStream("metadata/kemr_concepts_2015-05-27.csv");
+			in = getClass().getClassLoader().getResourceAsStream("metadata/" + fileName);
 			reader = new CSVReader(new InputStreamReader(in));
 			String[] nextLine;
 			while ((nextLine = reader.readNext()) != null) {
