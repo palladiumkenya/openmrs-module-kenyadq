@@ -39,7 +39,7 @@
 		<appframeworkVersion>2.2.1</appframeworkVersion>
 		<calculationVersion>1.1</calculationVersion>
 		<idgenVersion>2.6</idgenVersion>
-		<kenyacoreVersion>2.1-SNAPSHOT</kenyacoreVersion>
+		<kenyacoreVersion>2.3-SNAPSHOT</kenyacoreVersion>
 		<kenyauiVersion>2.0.3-SNAPSHOT</kenyauiVersion>
 		<metadatadeployVersion>1.4</metadatadeployVersion>
 		<metadatasharingVersion>1.1.8</metadatasharingVersion>
