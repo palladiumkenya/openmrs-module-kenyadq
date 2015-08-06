@@ -1,17 +1,24 @@
 <%
-    ui.decorateWith("kenyaemr", "standardPage", [ layout: "sidebar" ])
+    ui.decorateWith("kenyaemr", "standardPage", [layout: "sidebar"])
 
     def menuItems = [
-            [ label: "Merge patient records", iconProvider: "kenyadq", icon: "buttons/patient_merge.png", href: ui.pageLink("kenyadq", "datamgr/findDuplicatePatients") ],
-                    [ label: "Download analysis file", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadAnalysisFile") ],
-            [ label: "Download data dictionary", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadDataDictionary") ]
+            [label: "Merge patient records", iconProvider: "kenyadq", icon: "buttons/patient_merge.png", href: ui.pageLink("kenyadq", "datamgr/findDuplicatePatients")],
+            [label: "Data Analysis file", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadAnalysisFile")],
+            [label: "Data Dictionary", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadDataDictionary")],
+            [label: "DW Patient Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadPatientExtract")],
+            [label: "DW Patient Status Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadPatientStatusExtract")],
+            [label: "DW Patient Visit Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadPatientVisitExtract")],
+            [label: "DW Patient Pharmacy Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadPatientPharmacyExtract")],
+            [label: "DW Patient Laboratory Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadPatientLaboratoryExtract")],
+            [label: "DW Patient WAB/WHO/CD4 Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadPatientWABWHOCD4Extract")],
+            [label: "DW ART Patient Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadARTPatientExtract")]
     ]
 %>
 
 <div class="ke-page-sidebar">
-    ${ ui.includeFragment("kenyaui", "widget/panelMenu", [ heading: "Tasks", items: menuItems ]) }
+    ${ui.includeFragment("kenyaui", "widget/panelMenu", [heading: "Tasks", items: menuItems])}
 </div>
 
 <div class="ke-page-content">
-    ${ ui.includeFragment("kenyaemr", "system/databaseSummary") }
+    ${ui.includeFragment("kenyaemr", "system/databaseSummary")}
 </div>
