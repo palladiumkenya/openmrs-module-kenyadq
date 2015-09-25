@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.StringWriter;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by gitahi on 28/07/15.
@@ -29,7 +28,6 @@ public class CsvCreator {
                     i++;
                 }
                 writer.writeNext(row);
-                Map<Integer, Map<String, Object>> e;
             }
             return stringWriter.toString().getBytes();
         } catch (Exception ex) {

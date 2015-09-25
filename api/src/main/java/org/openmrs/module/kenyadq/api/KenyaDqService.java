@@ -58,6 +58,8 @@ public interface KenyaDqService extends OpenmrsService {
 
 	byte[] downloadARTPatientExtract();
 
+	byte[] downloadAll();
+
 	String timeStamp();
 
 	String location();

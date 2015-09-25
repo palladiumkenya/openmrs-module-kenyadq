@@ -17,13 +17,10 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.ConceptDatatype;
 import org.openmrs.ConceptDescription;
-import org.openmrs.GlobalProperty;
-import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.APIException;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
@@ -38,10 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -242,20 +237,16 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
         return dwPatientExtractService.downloadARTPatientExtract();
     }
 
+    public byte[] downloadAll() {
+        return dwPatientExtractService.downloadAll();
+    }
 
     public String timeStamp() {
-        Date now = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HHmmss");
-        return format.format(now);
+        return dwPatientExtractService.timeStamp();
     }
 
     public String location() {
-        AdministrationService administrationService = org.openmrs.api.context.Context.getAdministrationService();
-        GlobalProperty globalProperty = administrationService.getGlobalPropertyObject("kenyaemr.defaultLocation");
-        if (globalProperty.getValue() != null) {
-            return ((Location) globalProperty.getValue()).getName();
-        }
-        return "Unknown Location";
+        return dwPatientExtractService.location();
     }
 
     private String getUpn() {

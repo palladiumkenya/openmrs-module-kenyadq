@@ -9,6 +9,7 @@ import org.openmrs.ConceptName;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
+import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationAttributeType;
@@ -19,6 +20,7 @@ import org.openmrs.PatientIdentifier;
 import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
 import org.openmrs.Visit;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.FormService;
@@ -34,6 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,6 +50,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Created by gitahi on 28/07/15.
@@ -87,6 +93,8 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final DateFormat OBS_DATE_FORMAT = new SimpleDateFormat("MM/dd/yy");
 
+    private String mfl = "";
+
     private final boolean SAMPLE = false;
     private final int SAMPLE_SIZE = 10;
 
@@ -104,6 +112,9 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         EncounterInfo firstEncounterInfo = firstEncounterMap.get(patient.getId());
         if (firstEncounterInfo == null) {
             firstEncounterInfo = getFirstEncounterInfo(patient);
+            if ("".equals(mfl)) {
+                mfl = firstEncounterInfo.locationInfo.mfl;
+            }
             firstEncounterMap.put(patient.getId(), firstEncounterInfo);
         }
         return firstEncounterInfo;
@@ -775,6 +786,40 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         return csvCreator.createCsv(data, getARTPatientExtractHeaderRow());
     }
 
+    @Override
+    public byte[] downloadAll() {
+        Map<String, byte[]> contents = new HashMap<String, byte[]>();
+        contents.put("ARTPatientExtract" + "-" + location() + "-" + timeStamp() + mfl + ".csv", downloadARTPatientExtract());
+        contents.put("PatientExtract" + "-" + location() + "-" + timeStamp() + mfl + ".csv", downloadPatientExtract());
+        contents.put("PatientLaboratoryExtract" + "-" + location() + "-" + timeStamp() + mfl + ".csv", downloadPatientLaboratoryExtract());
+        contents.put("PatientPharmacyExtract" + "-" + location() + "-" + timeStamp() + mfl + ".csv", downloadPatientPharmacyExtract());
+        contents.put("PatientStatusExtract" + "-" + location() + "-" + timeStamp() + mfl + ".csv", downloadPatientStatusExtract());
+//        contents.put("PatientVisitExtract" + "-" + location() + "-" + timeStamp() + mfl + ".csv", downloadPatientVisitExtract());
+        contents.put("PatientWABWHOCD4Extract" + "-" + location() + "-" + timeStamp() + mfl + ".csv", downloadPatientWABWHOCD4Extract());
+        byte[] ret = null;
+        try {
+            ret = zipBytes(contents);
+        } catch (Exception ex) {
+
+        }
+        return ret;
+    }
+
+    public byte[] zipBytes(Map<String, byte[]> contents) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(baos);
+        for (String fileName : contents.keySet()) {
+            byte[] input = contents.get(fileName);
+            ZipEntry entry = new ZipEntry(fileName);
+            entry.setSize(input.length);
+            zos.putNextEntry(entry);
+            zos.write(input);
+            zos.closeEntry();
+        }
+        zos.close();
+        return baos.toByteArray();
+    }
+
     private String getRegimen(List<Order> drugOrders) {
         String regimen = "";
         for (Order drugOrder : drugOrders) {
@@ -1414,5 +1459,20 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         } catch (Exception ex) {
             return obsDate;
         }
+    }
+
+    public String timeStamp() {
+        Date now = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HHmmss");
+        return format.format(now);
+    }
+
+    public String location() {
+        AdministrationService administrationService = org.openmrs.api.context.Context.getAdministrationService();
+        GlobalProperty globalProperty = administrationService.getGlobalPropertyObject("kenyaemr.defaultLocation");
+        if (globalProperty.getValue() != null) {
+            return ((Location) globalProperty.getValue()).getName();
+        }
+        return "Unknown Location";
     }
 }

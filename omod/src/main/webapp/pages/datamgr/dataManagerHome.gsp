@@ -11,7 +11,8 @@
             [label: "DW Patient Pharmacy Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadPatientPharmacyExtract")],
             [label: "DW Patient Laboratory Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadPatientLaboratoryExtract")],
             [label: "DW Patient WAB/WHO/CD4 Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadPatientWABWHOCD4Extract")],
-            [label: "DW ART Patient Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadARTPatientExtract")]
+            [label: "DW ART Patient Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadARTPatientExtract")],
+            [label: "DW All (Except Visit)", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadAll")]
     ]
 %>
 

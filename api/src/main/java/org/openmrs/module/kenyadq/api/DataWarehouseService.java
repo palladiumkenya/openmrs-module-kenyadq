@@ -18,4 +18,6 @@ public interface DataWarehouseService {
     byte[] downloadPatientWABWHOCD4Extract();
 
     byte[] downloadARTPatientExtract();
+
+    byte[] downloadAll();
 }
