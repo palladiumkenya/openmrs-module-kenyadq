@@ -35,10 +35,32 @@ public interface KenyaDqService extends OpenmrsService {
 	 * @param notPreferred the non-preferred patient
 	 */
 	void mergePatients(Patient preferred, Patient notPreferred) throws APIException;
-	public List<Object> executeSqlQuery(String query, Map<String, Object> substitutions);
-	public List<Object> executeHqlQuery(String query, Map<String, Object> substitutions);
 
-	public byte[] downloadAnalysisFile();
+	List<Object> executeSqlQuery(String query, Map<String, Object> substitutions);
 
-	public byte[] downloadDataDictionary();
+	List<Object> executeHqlQuery(String query, Map<String, Object> substitutions);
+
+	byte[] downloadAnalysisFile();
+
+	byte[] downloadDataDictionary();
+
+	byte[] downloadPatientExtract();
+
+	byte[] downloadPatientStatusExtract();
+
+	byte[] downloadPatientVisitExtract();
+
+	byte[] downloadPatientLaboratoryExtract();
+
+	byte[] downloadPatientPharmacyExtract();
+
+	byte[] downloadPatientWABWHOCD4Extract();
+
+	byte[] downloadARTPatientExtract();
+
+	byte[] downloadAll();
+
+	String timeStamp();
+
+	String location();
 }
