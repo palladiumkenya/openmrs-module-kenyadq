@@ -12,7 +12,13 @@
             [label: "DW Patient Laboratory Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadPatientLaboratoryExtract")],
             [label: "DW Patient WAB/WHO/CD4 Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadPatientWABWHOCD4Extract")],
             [label: "DW ART Patient Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadARTPatientExtract")],
-            [label: "DW All (Except Visit)", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadAll")]
+            [label: "DW All (Except Visit)", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadAll")],
+            [label: "DW Flat Patient Laboratory Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadFlatPatientLabExtract")],
+            [label: "DW Flat Patient Visit Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadFlatPatientVisitExtract")],
+            [label: "DW Flat Patient Pharmacy Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadFlatPatientPharmacyExtract")],
+            [label: "DW Flat Patient Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadFlatPatientExtract")],
+            [label: "DW Flat ART Patient Extract", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadFlatARTPatientExtract")],
+            [label: "DW Flat All ", iconProvider: "kenyadq", icon: "buttons/download_analysis_file.png", href: ui.pageLink("kenyadq", "datamgr/downloadFlatAll")]
     ]
 %>
 

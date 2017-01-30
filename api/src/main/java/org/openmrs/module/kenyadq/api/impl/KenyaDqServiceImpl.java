@@ -62,6 +62,8 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 
     private KenyaDqDao dao;
 
+    private DataWarehouseQueries dwq = new DataWarehouseQueries();
+
     protected static final Log log = LogFactory.getLog(KenyaDqServiceImpl.class);
 
     /**
@@ -446,4 +448,106 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
     private String escape(String string) {
         return string.replace("'", "''");
     }
+
+    //testDW using flat table
+    public byte[] downloadFlatPatientLabExtract() {
+        List<Object> headerRow = dwq.getLabExtractHeaderRow();
+        List<Object> data = dao.executeSqlQuery(dwq.labExtractQuery(),
+                new HashMap<String, Object>());
+        return downloadCsvFile(data, headerRow.toArray());
+    }
+
+    public byte[] downloadFlatPatientVisitExtract() {
+        List<Object> headerRow = dwq.getPatientVisitHeaderRow();
+        List<Object> data = dao.executeSqlQuery(dwq.getPatientVisitQuery(),
+                new HashMap<String, Object>());
+        return downloadCsvFile(data, headerRow.toArray());
+    }
+
+    public byte[] downloadFlatPatientExtract() {
+        List<Object> headerRow = dwq.getPatientHeaderRow();
+        List<Object> data = dao.executeSqlQuery(dwq.getPatientExtractQuery(),
+                new HashMap<String, Object>());
+        return downloadCsvFile(data, headerRow.toArray());
+    }
+
+    public byte[] downloadFlatPatientStatusExtract() {
+        List<Object> headerRow = dwq.getPatientStatusHeaderRow();
+        List<Object> data = dao.executeSqlQuery(dwq.PatientStatusExtractQuery(),
+                new HashMap<String, Object>());
+        return downloadCsvFile(data, headerRow.toArray());
+    }
+
+    public byte[] downloadFlatARTPatientExtract() {
+        List<Object> headerRow = dwq.getARTPatientExtractHeaderRow();
+        List<Object> data = dao.executeSqlQuery(dwq.ARTPatientExtracQuery(),
+                new HashMap<String, Object>());
+        return downloadCsvFile(data, headerRow.toArray());
+    }
+
+    public byte[] downloadFlatPatientPharmacyExtract() {
+        List<Object> headerRow = dwq.getPatientPharmacyExtractHeaderRow();
+        List<Object> data = dao.executeSqlQuery(dwq.pharmacyExtractQuery(),
+                new HashMap<String, Object>());
+        return downloadCsvFile(data, headerRow.toArray());
+    }
+
+
+    @Override
+    public byte[] downloadFlatAll() {
+        Map<String, byte[]> contents = new HashMap<String, byte[]>();
+        contents.put("ARTPatientExtract" + "-" + location() + "-" + timeStamp()  + ".csv", downloadFlatARTPatientExtract());
+        contents.put("PatientExtract" + "-" + location() + "-" + timeStamp() + ".csv", downloadFlatPatientExtract());
+        contents.put("PatientLaboratoryExtract" + "-" + location() + "-" + timeStamp() + ".csv", downloadFlatPatientLabExtract());
+        contents.put("PatientPharmacyExtract" + "-" + location() + "-" + timeStamp() + ".csv", downloadFlatPatientPharmacyExtract());
+        contents.put("PatientStatusExtract" + "-" + location() + "-" + timeStamp()  + ".csv", downloadFlatPatientStatusExtract());
+        contents.put("PatientVisitExtract" + "-" + location() + "-" + timeStamp() + ".csv", downloadFlatPatientVisitExtract());
+//        contents.put("PatientWABWHOCD4Extract" + "-" + location() + "-" + timeStamp() + mfl + ".csv", downloadPatientWABWHOCD4Extract());
+        byte[] ret = null;
+        try {
+            ret = dwPatientExtractService.zipBytes(contents);
+        } catch (Exception ex) {
+
+        }
+        return ret;
+    }
+
+    private void labExtractColumnHeaders(List<Object> columnHeaders) {
+
+        columnHeaders.add("patient_id");
+        columnHeaders.add("Gender");
+        columnHeaders.add("DOB");
+        columnHeaders.add("unique_patient_no");
+        columnHeaders.add("national_id_no");
+        columnHeaders.add("patient_clinic_number");
+        columnHeaders.add("visit_date");
+        columnHeaders.add("siteCode");
+        columnHeaders.add("siteName");
+        columnHeaders.add("lab_test");
+        columnHeaders.add("lab_test");
+        columnHeaders.add("test_result");
+        columnHeaders.add("lab_test_results");
+//        columnHeaders.add("death_date");
+//        columnHeaders.add("cause_of_death");
+////		headerRow.add("telephone");
+//        columnHeaders.add("postal_address");
+//        columnHeaders.add("school_employer_address");
+//        columnHeaders.add("location");
+//        columnHeaders.add("village_estate");
+//        columnHeaders.add("county");
+//        columnHeaders.add("district");
+//        columnHeaders.add("sub_location");
+//        columnHeaders.add("landmark");
+////		headerRow.add("subchief");
+//        columnHeaders.add("province");
+//        columnHeaders.add("division");
+//        columnHeaders.add("house_no");
+//        columnHeaders.add("patient_voided");
+//        columnHeaders.add("visit_uuid");
+//        columnHeaders.add("visit_type");
+//        columnHeaders.add("visit_start_date");
+//        columnHeaders.add("visit_end_date");
+//        columnHeaders.add("obs_uuid");
+    }
+
 }
