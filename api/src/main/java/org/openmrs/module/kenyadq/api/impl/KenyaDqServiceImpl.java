@@ -492,6 +492,14 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
         return downloadCsvFile(data, headerRow.toArray());
     }
 
+    public byte[] downloadFlatPatientWABWHOCD4Extract() {
+        List<Object> headerRow = dwq.getPatientWABWHOCD4ExtractHeaderRow();
+        List<Object> data = dao.executeSqlQuery(dwq.getPatientWABWHOCD4ExtractQuery(),
+                new HashMap<String, Object>());
+        return downloadCsvFile(data, headerRow.toArray());
+    }
+
+
 
     @Override
     public byte[] downloadFlatAll() {
@@ -502,7 +510,7 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
         contents.put("PatientPharmacyExtract" + "-" + location() + "-" + timeStamp() + ".csv", downloadFlatPatientPharmacyExtract());
         contents.put("PatientStatusExtract" + "-" + location() + "-" + timeStamp()  + ".csv", downloadFlatPatientStatusExtract());
         contents.put("PatientVisitExtract" + "-" + location() + "-" + timeStamp() + ".csv", downloadFlatPatientVisitExtract());
-//        contents.put("PatientWABWHOCD4Extract" + "-" + location() + "-" + timeStamp() + mfl + ".csv", downloadPatientWABWHOCD4Extract());
+        contents.put("PatientWABWHOCD4Extract" + "-" + location() + "-" + timeStamp() + ".csv", downloadFlatPatientWABWHOCD4Extract());
         byte[] ret = null;
         try {
             ret = dwPatientExtractService.zipBytes(contents);

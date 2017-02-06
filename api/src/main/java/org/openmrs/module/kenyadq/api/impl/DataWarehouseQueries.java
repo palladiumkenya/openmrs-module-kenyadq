@@ -19,10 +19,10 @@ public class DataWarehouseQueries {
                 "(select value_reference from location_attribute\n" +
                 "where location_id in (select property_value\n" +
                 "from global_property\n" +
-                "where property='kenyaemr.defaultLocation')) as siteCode,\n" +
+                "where property='kenyaemr.defaultLocation') and attribute_type_id=1) as siteCode,\n" +
                 "fup.visit_id as VisitID,\n" +
                 "fup.visit_date as VisitDate,\n" +
-                "'Service' as Service,\n" +
+                "'Out Patient' as Service,\n" +
                 "fup.visit_scheduled as VisitType,\n" +
                 "case fup.who_stage \n" +
                 "\twhen 1220 then 'WHO_STAGE_1'\n" +
@@ -90,7 +90,7 @@ public class DataWarehouseQueries {
                 "(select value_reference from location_attribute\n" +
                 "where location_id in (select property_value\n" +
                 "from global_property\n" +
-                "where property='kenyaemr.defaultLocation')) as siteCode,\n" +
+                "where property='kenyaemr.defaultLocation') and attribute_type_id=1) as siteCode,\n" +
                 "(select name from location\n" +
                 "where location_id in (select property_value\n" +
                 "from global_property\n" +
@@ -150,7 +150,7 @@ public class DataWarehouseQueries {
                 "(select value_reference from location_attribute\n" +
                 "where location_id in (select property_value\n" +
                 "from global_property\n" +
-                "where property='kenyaemr.defaultLocation')) as siteCode,\n" +
+                "where property='kenyaemr.defaultLocation') and attribute_type_id=1) as siteCode,\n" +
                 "(select name from location\n" +
                 "where location_id in (select property_value\n" +
                 "from global_property\n" +
@@ -178,7 +178,7 @@ public class DataWarehouseQueries {
                 "(select value_reference from location_attribute\n" +
                 "where location_id in (select property_value\n" +
                 "from global_property\n" +
-                "where property='kenyaemr.defaultLocation')) as siteCode,\n" +
+                "where property='kenyaemr.defaultLocation') and attribute_type_id=1) as siteCode,\n" +
                 "(select name from location\n" +
                 "where location_id in (select property_value\n" +
                 "from global_property\n" +
@@ -284,7 +284,7 @@ public class DataWarehouseQueries {
                 "(select value_reference from location_attribute\n" +
                 "where location_id in (select property_value\n" +
                 "from global_property\n" +
-                "where property='kenyaemr.defaultLocation')) as siteCode,\n" +
+                "where property='kenyaemr.defaultLocation') and attribute_type_id=1) as siteCode,\n" +
                 "ph.visit_id as VisitID,\n" +
                 "ph.visit_date as DispenseDate,\n" +
                 "if(cn2.name is not null, cn2.name,cn.name) as Drug,\n" +
@@ -300,6 +300,74 @@ public class DataWarehouseQueries {
                 "and fup.patient_id=ph.patient_id\n" +
                 "where unique_patient_no is not null\n" +
                 "order by ph.patient_id,ph.visit_date";
+
+        return  sqlQuery;
+    }
+
+    public String getPatientWABWHOCD4ExtractQuery(){
+        String sqlQuery="select \n" +
+                "d.unique_patient_no as PatientID,\n" +
+                "d.patient_id as PatientPK,\n" +
+                "(select value_reference from location_attribute\n" +
+                "where location_id in (select property_value\n" +
+                "from global_property\n" +
+                "where property='kenyaemr.defaultLocation') and attribute_type_id=1) as siteCode,\n" +
+                "(select name from location\n" +
+                "where location_id in (select property_value\n" +
+                "from global_property\n" +
+                "where property='kenyaemr.defaultLocation')) as FacilityName,\n" +
+                "-- p_dates.enrollment_date as aprox_enr,\n" +
+                "-- mid(max(if(l.visit_date<=p_dates.enrollment_date,concat(l.visit_date,test_result),null)),11) as Initial_Cd4_percent1,\n" +
+                " mid(max(if(l.visit_date<=p_dates.enrollment_date,concat(l.visit_date,test_result),null)),11) as eCd4,\n" +
+                " left(max(if(l.visit_date<=p_dates.enrollment_date,concat(l.visit_date,test_result),null)),10) as eCd4Date,\n" +
+                " if(fup.visit_date<=p_dates.enrollment_date,\n" +
+                " case who_stage\n" +
+                "\twhen 1220 then 'WHO_STAGE_1'\n" +
+                "\twhen 1221 then 'WHO_STAGE_2'\n" +
+                "    when 1222 then 'WHO_STAGE_3'\n" +
+                "    when 1223 then 'WHO_STAGE_4'\n" +
+                "    when 1204 then 'WHO_STAGE_1'\n" +
+                "    when 1205 then 'WHO_STAGE_2'\n" +
+                "    when 1206 then 'WHO_STAGE_3'\n" +
+                "    when 1207 then 'WHO_STAGE_4'\n" +
+                " end,null) as ewhostage,\n" +
+                " if(fup.visit_date<=p_dates.enrollment_date and who_stage is not null,\n" +
+                "fup.visit_date,null) as ewhodate,\n" +
+                " mid(max(concat(fup.visit_date,case who_stage\n" +
+                "\twhen 1220 then 'WHO_STAGE_1'\n" +
+                "\twhen 1221 then 'WHO_STAGE_2'\n" +
+                "    when 1222 then 'WHO_STAGE_3'\n" +
+                "    when 1223 then 'WHO_STAGE_4'\n" +
+                "    when 1204 then 'WHO_STAGE_1'\n" +
+                "    when 1205 then 'WHO_STAGE_2'\n" +
+                "    when 1206 then 'WHO_STAGE_3'\n" +
+                "    when 1207 then 'WHO_STAGE_4'\n" +
+                " end)),11) as lastwho,\n" +
+                " left(max(concat(fup.visit_date,case who_stage\n" +
+                "\twhen 1220 then 'WHO_STAGE_1'\n" +
+                "\twhen 1221 then 'WHO_STAGE_2'\n" +
+                "    when 1222 then 'WHO_STAGE_3'\n" +
+                "    when 1223 then 'WHO_STAGE_4'\n" +
+                "    when 1204 then 'WHO_STAGE_1'\n" +
+                "    when 1205 then 'WHO_STAGE_2'\n" +
+                "    when 1206 then 'WHO_STAGE_3'\n" +
+                "    when 1207 then 'WHO_STAGE_4'\n" +
+                " end)),10) as lastwhodate,\n" +
+                "  mid(max(concat(l.visit_date,l.test_result)),11) as lastcd4,\n" +
+                " left(max(concat(l.visit_date,l.test_result)),10) as lastcd4date,\n" +
+                " mid(max(if(l.visit_date>p_dates.six_month_date and l.visit_date<p_dates.twelve_month_date ,concat(l.visit_date,test_result),null)),11) as m6Cd4,\n" +
+                " left(max(if(l.visit_date>=p_dates.six_month_date and l.visit_date<p_dates.twelve_month_date ,concat(l.visit_date,test_result),null)),10) as m6Cd4Date,\n" +
+                " mid(max(if(l.visit_date>=p_dates.twelve_month_date,concat(l.visit_date,test_result),null)),11) as m6Cd4,\n" +
+                " left(max(if(l.visit_date>p_dates.twelve_month_date,concat(l.visit_date,test_result),null)),10) as m6Cd4Date\n" +
+                "from kenyaemr_etl.etl_patient_hiv_followup fup\n" +
+                "join kenyaemr_etl.etl_patient_demographics d on d.patient_id=fup.patient_id\n" +
+                "join (select e.patient_id,date_add(date_add(min(e.visit_date),interval 3 month), interval 1 day) as enrollment_date,\n" +
+                "date_add(date_add(min(e.visit_date), interval 6 month),interval 1 day) as six_month_date,\n" +
+                "date_add(date_add(min(e.visit_date), interval 12 month),interval 1 day) as twelve_month_date\n" +
+                "from kenyaemr_etl.etl_hiv_enrollment e\n" +
+                "group by e.patient_id) p_dates on p_dates.patient_id=fup.patient_id\n" +
+                "left outer join kenyaemr_etl.etl_laboratory_extract l on l.patient_id=fup.patient_id and l.lab_test in (5497,730)\n" +
+                "group by fup.patient_id";
 
         return  sqlQuery;
     }
@@ -436,4 +504,28 @@ public class DataWarehouseQueries {
         return headerRow;
     }
 
+    public List<Object> getPatientWABWHOCD4ExtractHeaderRow() {
+        List<Object> headerRow = new ArrayList<Object>();
+        headerRow.add("PatientID");
+        headerRow.add("PatientPK");
+        headerRow.add("FacilityID");
+        headerRow.add("SiteCode");
+        headerRow.add("eCD4");
+        headerRow.add("eCD4Date");
+        headerRow.add("eWHO");
+        headerRow.add("eWHODate");
+//        headerRow.add("bCD4");
+//        headerRow.add("bCD4Date");
+//        headerRow.add("bWHO");
+//        headerRow.add("bWHODate");
+        headerRow.add("lastWHO");
+        headerRow.add("lastWHODate");
+        headerRow.add("lastCD4");
+        headerRow.add("lastCD4Date");
+        headerRow.add("m12CD4");
+        headerRow.add("m12CD4Date");
+        headerRow.add("m6CD4");
+        headerRow.add("m6CD4Date");
+        return headerRow;
+    }
 }

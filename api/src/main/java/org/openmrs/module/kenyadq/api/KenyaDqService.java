@@ -64,6 +64,8 @@ public interface KenyaDqService extends OpenmrsService {
 
 	byte[] downloadPatientWABWHOCD4Extract();
 
+	byte[] downloadFlatPatientWABWHOCD4Extract();
+
 	byte[] downloadARTPatientExtract();
 
 	byte[] downloadFlatARTPatientExtract();
