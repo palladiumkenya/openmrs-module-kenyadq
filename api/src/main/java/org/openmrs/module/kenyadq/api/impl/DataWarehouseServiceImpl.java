@@ -858,7 +858,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         return str;
     }
 
-    private List<Object> getPatientHeaderRow() {
+    public List<Object> getPatientHeaderRow() {
         List<Object> headerRow = new ArrayList<Object>();
         headerRow.add("PatientID");
         headerRow.add("PatientPK");
@@ -886,7 +886,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         return headerRow;
     }
 
-    private List<Object> getPatientStatusHeaderRow() {
+    protected List<Object> getPatientStatusHeaderRow() {
         List<Object> headerRow = new ArrayList<Object>();
         headerRow.add("PatientID");
         headerRow.add("PatientPK");
@@ -898,7 +898,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         return headerRow;
     }
 
-    private List<Object> getPatientVisitHeaderRow() {
+    protected List<Object> getPatientVisitHeaderRow() {
         List<Object> headerRow = new ArrayList<Object>();
         headerRow.add("PatientID");
         headerRow.add("PatientPK");
@@ -918,6 +918,12 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         headerRow.add("BP");
         headerRow.add("OI");
         headerRow.add("OIDate");
+        headerRow.add("SubstitutionFirstlineRegimenDate");
+        headerRow.add("SubstitutionFirstlineRegimenReason");
+        headerRow.add("SubstitutionSecondlineRegimenDate");
+        headerRow.add("SubstitutionSecondlineRegimenReason");
+        headerRow.add("SecondlineRegimenChangeDate");
+        headerRow.add("SecondlineRegimenChangeReason");
         headerRow.add("Adherence");
         headerRow.add("AdherenceCategory");
         headerRow.add("FamilyPlanningMethod");
@@ -927,7 +933,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         return headerRow;
     }
 
-    private List<Object> getPatientLaboratoryHeaderRow() {
+    protected List<Object> getPatientLaboratoryHeaderRow() {
         List<Object> headerRow = new ArrayList<Object>();
         headerRow.add("PatientID");
         headerRow.add("PatientPK");
@@ -941,7 +947,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         return headerRow;
     }
 
-    private List<Object> getPatientPharmacyExtractHeaderRow() {
+    protected List<Object> getPatientPharmacyExtractHeaderRow() {
         List<Object> headerRow = new ArrayList<Object>();
         headerRow.add("PatientID");
         headerRow.add("SiteCode");
@@ -958,7 +964,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         return headerRow;
     }
 
-    private List<Object> getPatientWABWHOCD4ExtractHeaderRow() {
+    protected List<Object> getPatientWABWHOCD4ExtractHeaderRow() {
         List<Object> headerRow = new ArrayList<Object>();
         headerRow.add("PatientID");
         headerRow.add("PatientPK");
@@ -983,7 +989,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         return headerRow;
     }
 
-    private List<Object> getARTPatientExtractHeaderRow() {
+            protected List<Object> getARTPatientExtractHeaderRow() {
         List<Object> headerRow = new ArrayList<Object>();
         headerRow.add("PatientPK");
         headerRow.add("PatientID");

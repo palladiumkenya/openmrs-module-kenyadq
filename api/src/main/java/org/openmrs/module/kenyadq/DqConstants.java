@@ -30,4 +30,9 @@ public class DqConstants {
 	public static final String APP_DATAQUALITY = MODULE_ID + ".dataQuality";
 
 	public static final String APP_DATAMANAGER = MODULE_ID + ".dataManager";
+
+	public static final String EMR = "KenyaEMR";
+
+	public static final String PROJECT = "I-TECH";
+
 }

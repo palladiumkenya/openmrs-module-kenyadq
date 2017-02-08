@@ -24,17 +24,20 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.kenyacore.CoreConstants;
+import org.openmrs.module.kenyadq.DqConstants;
 import org.openmrs.module.kenyadq.api.KenyaDqService;
 import org.openmrs.module.kenyadq.api.db.KenyaDqDao;
+import org.openmrs.module.kenyadq.utils.KenyaDqUtils;
 import org.openmrs.module.kenyaemr.Metadata;
+import org.openmrs.module.kenyaemr.api.KenyaEmrService;
+import org.openmrs.module.kenyaemr.wrapper.Facility;
 import org.openmrs.serialization.SerializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,6 +45,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Module service implementation
@@ -69,11 +74,13 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
      */
     public void mergePatients(Patient preferred, Patient notPreferred) throws APIException {
         try {
-            Set<PatientIdentifier> preferredPatientIdentifiers = new HashSet<PatientIdentifier>(preferred.getActiveIdentifiers());
+            Set<PatientIdentifier> preferredPatientIdentifiers = new HashSet<PatientIdentifier>(preferred
+                    .getActiveIdentifiers());
 
             patientService.mergePatients(preferred, notPreferred);
 
-            for (Map.Entry<PatientIdentifierType, List<PatientIdentifier>> entry : getAllPatientIdentifiers(preferred).entrySet()) {
+            for (Map.Entry<PatientIdentifierType, List<PatientIdentifier>> entry : getAllPatientIdentifiers
+                    (preferred).entrySet()) {
                 List<PatientIdentifier> idsForType = entry.getValue();
 
                 if (idsForType.size() > 1) {
@@ -126,11 +133,11 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
      * Helper method to get all of a patient's identifiers organized by type
      *
      * @param patient the patient
-     *
      * @return the map of identifier types to identifiers
      */
     protected Map<PatientIdentifierType, List<PatientIdentifier>> getAllPatientIdentifiers(Patient patient) {
-        Map<PatientIdentifierType, List<PatientIdentifier>> ids = new HashMap<PatientIdentifierType, List<PatientIdentifier>>();
+        Map<PatientIdentifierType, List<PatientIdentifier>> ids = new HashMap<PatientIdentifierType,
+                List<PatientIdentifier>>();
         for (PatientIdentifier identifier : patient.getActiveIdentifiers()) {
             PatientIdentifierType idType = identifier.getIdentifierType();
             List<PatientIdentifier> idsForType = ids.get(idType);
@@ -210,35 +217,244 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
     }
 
     public byte[] downloadPatientExtract() {
-        return dwPatientExtractService.downloadPatientExtract();
+        String query = "select pd.unique_patient_no as PatientID, pd.patient_id as PatientPK, :siteCode, " +
+                ":facilityName, pd.Gender, pd.DOB, '' as RegistrationDate, he.date_first_enrolled_in_care as " +
+                "RegistrationAtCCC, (select eme.visit_date from kenyaemr_etl.etl_mch_enrollment eme where patient_id " +
+                "= pd.patient_id order by eme.visit_date desc limit 1) as RegistrationATPMTCT, (select ete" +
+                ".date_first_enrolled_in_tb_care from kenyaemr_etl.etl_tb_enrollment ete where patient_id = pd" +
+                ".patient_id order by ete.date_first_enrolled_in_tb_care desc limit 1) as RegistrationAtTBClinic, " +
+                "(select cn.name from concept_name cn where cn.concept_id = he.entry_point and cn.locale=:locale " +
+                "order by field(cn.concept_name_type, 'SHORT','FULLY_SPECIFIED', 'NULL') LIMIT 1) as PatientSource, " +
+                "'' as Region, '' as District, '' as Village, pd.next_of_kin, (select ehf.visit_date " +
+                "from kenyaemr_etl.etl_patient_hiv_followup ehf where ehf.patient_id = pd.patient_id order by 1 DESC " +
+                "limit 1) as LastVisit, pd.marital_status as MaritalStatus, pd.education_level as EducationLevel, he" +
+                ".date_confirmed_hiv_positive, '' as PreviousARTExposure, he" +
+                ".date_started_art_at_transferring_facility as PreviousARTStartDate, " +
+                ":emr, :project from kenyaemr_etl.etl_patient_demographics pd left join kenyaemr_etl" +
+                ".etl_hiv_enrollment he on pd.patient_id = he.patient_id group by pd.patient_id;";
+
+        Map<String, Object> substitutions = new HashMap<String, Object>();
+        substitutions.put("siteCode", KenyaDqUtils.getMflCode());
+        substitutions.put("facilityName", KenyaDqUtils.getFacilityName());
+        substitutions.put("emr", DqConstants.EMR);
+        substitutions.put("project", DqConstants.PROJECT);
+        substitutions.put("locale", CoreConstants.LOCALE);
+
+        List<Object> patientExtracts = dao.executeSqlQuery(query, substitutions);
+        return downloadCsvFile(patientExtracts, dwPatientExtractService.getPatientHeaderRow().toArray());
     }
 
     public byte[] downloadPatientStatusExtract() {
-        return dwPatientExtractService.downloadPatientStatusExtract();
+        String query = "select pd.unique_patient_no as PatientID, pd.patient_id as PatientPK, :siteCode, " +
+                ":facilityName, \"\", he.date_of_discontinuation, he.discontinuation_reason from kenyaemr_etl" +
+                ".etl_patient_demographics pd left join kenyaemr_etl.etl_hiv_enrollment he on pd.patient_id = he" +
+                ".patient_id group by pd.patient_id;";
+
+        Map<String, Object> substitutions = new HashMap<String, Object>();
+        substitutions.put("siteCode", KenyaDqUtils.getMflCode());
+        substitutions.put("facilityName", KenyaDqUtils.getFacilityName());
+
+        return downloadCsvFile(dao.executeSqlQuery(query, substitutions), dwPatientExtractService
+                .getPatientStatusHeaderRow().toArray());
     }
 
     public byte[] downloadPatientVisitExtract() {
-        return dwPatientExtractService.downloadPatientVisitExtract();
+        String query = "select pd.unique_patient_no as PatientID, pd.patient_id as PatientPK, :facilityName, " +
+                ":siteCode, ehf.visit_id, ehf.visit_date, (select name from encounter_type et join encounter e on " +
+                "et.encounter_type_id = e.encounter_type where encounter_id = ehf.encounter_id) as Service, case ehf" +
+                ".visit_scheduled when 1 then 'Scheduled' when 0 then 'Unscheduled' end as VisitType, (select cn.name" +
+                " from concept_name cn where cn.concept_id = ehf.who_stage and cn.locale=:locale order by field(cn" +
+                ".concept_name_type, 'SHORT','FULLY_SPECIFIED') DESC LIMIT 1) as WHOStage, '' as WABStage, (select cn" +
+                ".name from concept_name cn where cn.concept_id = ehf.pregnancy_status and cn.locale=:locale order by" +
+                " " +
+                "field(cn.concept_name_type, 'SHORT','FULLY_SPECIFIED') DESC LIMIT 1) as Pregnant, ehf" +
+                ".last_menstrual_period as LMP, ehf.expected_delivery_date as EDD, ehf.height, ehf.weight, concat(ehf" +
+                ".systolic_pressure,'/',ehf.diastolic_pressure) as BP, '' as OI, '' as OIDate, ehf" +
+                ".substitution_first_line_regimen_date, ehf.substitution_first_line_regimen_reason, ehf" +
+                ".substitution_second_line_regimen_date, ehf.substitution_second_line_regimen_reason, ehf" +
+                ".second_line_regimen_change_date, ehf.second_line_regimen_change_reason, concat(ifnull((select cn" +
+                ".name from concept_name cn where cn.concept_id = ehf.ctx_adherence and cn.locale=:locale order by " +
+                "field" +
+                "(cn.concept_name_type, 'SHORT','FULLY_SPECIFIED') DESC LIMIT 1),'N/A'),' - ', ifnull((select cn.name" +
+                " from concept_name cn where cn.concept_id = ehf.arv_adherence and cn.locale=:locale order by field" +
+                "(cn" +
+                ".concept_name_type, 'SHORT','FULLY_SPECIFIED') DESC LIMIT 1),'N/A')) as Adherence, concat ('CTX', ' " +
+                "- ', 'ART') as AdherenceCategory, (select cn.name from concept_name cn where cn.concept_id = ehf" +
+                ".family_planning_method and cn.locale=:locale order by field(cn.concept_name_type, 'SHORT'," +
+                "'FULLY_SPECIFIED') DESC LIMIT 1) as FamilyPlanningMethod, trim(trailing ',' from concat(if(ehf" +
+                ".condom_provided, 'Condoms,',''), if(ehf.pwp_disclosure, 'Disclosure,',''), if(ehf" +
+                ".pwp_partner_tested, 'Partner Testing,',''), if(ehf.screened_for_sti, 'Screened STI',''))) AS PwP, " +
+                "concat(timestampdiff(DAY, ehf.last_menstrual_period, ehf.visit_date), \" days\") AS GestationAge, " +
+                "ehf.next_appointment_date as NextAppointmentDate from kenyaemr_etl.etl_patient_demographics pd join " +
+                "kenyaemr_etl.etl_patient_hiv_followup ehf on pd.patient_id = ehf.patient_id";
+
+        Map<String, Object> substitutions = new HashMap<String, Object>();
+        substitutions.put("siteCode", KenyaDqUtils.getMflCode());
+        substitutions.put("facilityName", KenyaDqUtils.getFacilityName());
+        substitutions.put("locale", CoreConstants.LOCALE);
+
+        return downloadCsvFile(dao.executeSqlQuery(query, substitutions), dwPatientExtractService
+                .getPatientVisitHeaderRow().toArray());
     }
 
     public byte[] downloadPatientLaboratoryExtract() {
-        return dwPatientExtractService.downloadPatientLaboratoryExtract();
+        String query = "select pd.unique_patient_no as PatientID, pd.patient_id as PatientPK, :siteCode, " +
+                ":facilityName, le.visit_id, \"\" as OrderedByDate, le.date_test_requested as ReportedByDate, " +
+                "(select cn.name from concept_name cn where cn.concept_id = le.lab_test and cn.locale=:locale order " +
+                "by " +
+                "field(cn.concept_name_type, 'SHORT','FULLY_SPECIFIED', 'NULL') LIMIT 1) as TestName, (select cn.name" +
+                " from concept_name cn where cn.concept_id = le.test_result and cn.locale=:locale order by field(cn" +
+                ".concept_name_type, 'SHORT','FULLY_SPECIFIED', 'NULL') LIMIT 1) as TestResult from kenyaemr_etl" +
+                ".etl_patient_demographics pd join kenyaemr_etl.etl_laboratory_extract le on pd.patient_id=le" +
+                ".patient_id;";
+
+        Map<String, Object> substitutions = new HashMap<String, Object>();
+        substitutions.put("siteCode", KenyaDqUtils.getMflCode());
+        substitutions.put("facilityName", KenyaDqUtils.getFacilityName());
+        substitutions.put("locale", CoreConstants.LOCALE);
+
+        return downloadCsvFile(dao.executeSqlQuery(query, substitutions), dwPatientExtractService
+                .getPatientLaboratoryHeaderRow().toArray());
     }
 
     public byte[] downloadPatientPharmacyExtract() {
-        return dwPatientExtractService.downloadPatientPharmacyExtract();
+        String query = "select pd.unique_patient_no as PatientID,  :siteCode, :facilityName, pd.patient_id as " +
+                "PatientPK, pe.visit_id, pe.drug, pe.date_created, pe.duration, case pe.duration_units when 'Days' " +
+                "then date_add(pe.date_created, interval pe.duration DAY) when 'Weeks' then date_add(pe.date_created," +
+                " interval pe.duration WEEK) when 'Months' then date_add(pe.date_created, interval pe.duration MONTH)" +
+                " else \"\" end as ExpectedReturn, \"\",\"\",\"\" from kenyaemr_etl.etl_patient_demographics pd join " +
+                "kenyaemr_etl.etl_pharmacy_extract pe on pd.patient_id = pe.patient_id;";
+
+        Map<String, Object> substitutions = new HashMap<String, Object>();
+        substitutions.put("siteCode", KenyaDqUtils.getMflCode());
+        substitutions.put("facilityName", KenyaDqUtils.getFacilityName());
+
+        return downloadCsvFile(dao.executeSqlQuery(query, substitutions), dwPatientExtractService
+                .getPatientPharmacyExtractHeaderRow().toArray());
     }
 
     public byte[] downloadPatientWABWHOCD4Extract() {
-        return dwPatientExtractService.downloadPatientWABWHOCD4Extract();
+        String query = "select epd.unique_patient_no as PatientID, epd.patient_id as PatientPK, :facilityID, " +
+                ":siteCode, e_cd4.test_result as eCD4, e_cd4.date_test_requested as eCD4Date, e_who.test_result as" +
+                " eWHO, e_who.date_test_requested as eWHODate, b_cd4.test_result as bCD4, b_cd4.date_test_requested " +
+                "as bCD4Date, b_who.test_result as bWHO, b_who.date_test_requested as bWHODate, l_who.test_result as " +
+                "lastWHO, l_who.date_test_requested as lastWHODate, l_cd4.test_result as lastCD4, " +
+                "l_cd4.date_test_requested as lastCD4Date, m_12_cd4.test_result as m12CD4, " +
+                "m_12_cd4.date_test_requested as m12CD4Date, m_6_cd4.test_result as m6CD4, " +
+                "m_6_cd4.date_test_requested as m6CD4Date from kenyaemr_etl.etl_patient_demographics epd left join " +
+                "(select ele.patient_id, ele.test_result, ele.date_test_requested from kenyaemr_etl" +
+                ".etl_laboratory_extract ele join kenyaemr_etl.etl_hiv_enrollment ehe on ele.patient_id = ehe" +
+                ".patient_id where lab_test = :cd4_count and timestampdiff(DAY, ehe.visit_date, ele" +
+                ".date_test_requested) < " +
+                "90 group by ele.patient_id order by 1) e_cd4 on e_cd4.patient_id = epd.patient_id left join (select " +
+                "ele.patient_id, ele.test_result, ele.date_test_requested from kenyaemr_etl.etl_laboratory_extract " +
+                "ele join kenyaemr_etl.etl_hiv_enrollment ehe on ele.patient_id = ehe.patient_id where lab_test = " +
+                ":who_stage and timestampdiff(DAY, ehe.visit_date, ele.date_test_requested) < 90 group by ele" +
+                ".patient_id " +
+                "order by 1) e_who on epd.patient_id = e_who.patient_id left join (select ele.patient_id, ele" +
+                ".test_result, ele.date_test_requested from kenyaemr_etl.etl_laboratory_extract ele join kenyaemr_etl" +
+                ".etl_pharmacy_extract epe on ele.patient_id = epe.patient_id where lab_test = :cd4_count and " +
+                "timestampdiff" +
+                "(DAY, epe.date_created, ele.date_test_requested) < 90 group by ele.patient_id order by epe.id) b_cd4" +
+                " on b_cd4.patient_id = epd.patient_id left join (select ele.patient_id, ele.test_result, ele" +
+                ".date_test_requested from kenyaemr_etl.etl_laboratory_extract ele join kenyaemr_etl" +
+                ".etl_pharmacy_extract epe on ele.patient_id = epe.patient_id where lab_test = :who_stage and " +
+                "timestampdiff" +
+                "(DAY, epe.date_created, ele.date_test_requested) < 90 group by ele.patient_id order by epe.id) b_who" +
+                " on epd.patient_id = b_who.patient_id left join (select ele.patient_id, ele.test_result, ele" +
+                ".date_test_requested from kenyaemr_etl.etl_laboratory_extract ele where lab_test = :who_stage and " +
+                "ele.id " +
+                "in (select max(id) from kenyaemr_etl.etl_laboratory_extract group by patient_id)) l_who on l_who" +
+                ".patient_id = epd.patient_id left join (select ele.patient_id, ele.test_result, ele" +
+                ".date_test_requested from kenyaemr_etl.etl_laboratory_extract ele where lab_test = :cd4_count and " +
+                "ele.id " +
+                "in (select max(id) from kenyaemr_etl.etl_laboratory_extract group by patient_id)) l_cd4 on " +
+                "l_cd4.patient_id = epd.patient_id left join (select ele.patient_id, ele" +
+                ".test_result, ele.date_test_requested from kenyaemr_etl.etl_laboratory_extract ele join kenyaemr_etl" +
+                ".etl_pharmacy_extract epe on ele.patient_id" +
+                " = epe.patient_id where lab_test = :cd4_count and (timestampdiff(DAY, epe.date_created, ele" +
+                ".date_test_requested) between 330 and 390) group by ele.patient_id order by epe.id) m_12_cd4 on " +
+                "m_12_cd4.patient_id = epd.patient_id left join (select ele.patient_id, ele.test_result, ele" +
+                ".date_test_requested from kenyaemr_etl.etl_laboratory_extract ele join kenyaemr_etl" +
+                ".etl_pharmacy_extract epe on ele.patient_id = epe.patient_id where lab_test = :cd4_count and " +
+                "(timestampdiff(DAY, epe.date_created, ele.date_test_requested) between 150 and 210) group by ele" +
+                ".patient_id order by epe.id) m_6_cd4 on m_6_cd4.patient_id = epd.patient_id;";
+
+        Map<String, Object> substitutions = new HashMap<String, Object>();
+        substitutions.put("siteCode", KenyaDqUtils.getMflCode());
+        substitutions.put("facilityID", KenyaDqUtils.getFacilityId());
+        substitutions.put("cd4_count", conceptService.getConceptByUuid(Metadata.Concept.CD4_COUNT).getConceptId());
+        substitutions.put("who_stage", conceptService.getConceptByUuid(Metadata.Concept.CURRENT_WHO_STAGE)
+                .getConceptId());
+
+        return downloadCsvFile(dao.executeSqlQuery(query, substitutions), dwPatientExtractService
+                .getPatientWABWHOCD4ExtractHeaderRow().toArray());
     }
 
     public byte[] downloadARTPatientExtract() {
-        return dwPatientExtractService.downloadARTPatientExtract();
+        String query = "select epd.patient_id as PatientPK, epd.unique_patient_no as PatientID, if(" +
+                "(@ageEnrollment/*'*/:=/*'*/timestampdiff(YEAR, epd.dob, ehe.date_first_enrolled_in_care)) > 0, " +
+                "concat(@ageEnrollment, ' Years'), concat(@ageEnrollment/*'*/:=/*'*/timestampdiff(MONTH, epd.dob, ehe" +
+                ".date_first_enrolled_in_care), ' months')) as AgeEnrollment, if(" +
+                "(@ageARTStart/*'*/:=/*'*/timestampdiff(YEAR," +
+                " epd.dob, @startARTDate/*'*/:=/*'*/if(ehe.date_started_art_at_transferring_facility is not null, ehe" +
+                ".date_started_art_at_transferring_facility, (select visit_date from kenyaemr_etl" +
+                ".etl_pharmacy_extract where patient_id=ede.patient_id and is_arv=1 order by 1 asc limit 1)))) > 0, " +
+                "concat(@ageARTStart, ' years'), concat(@ageARTStart/*'*/:=/*'*/timestampdiff(MONTH, epd.dob, " +
+                "@startARTDate/*'*/:=/*'*/if(ehe.date_started_art_at_transferring_facility is not null, ehe" +
+                ".date_started_art_at_transferring_facility, (select visit_date from kenyaemr_etl" +
+                ".etl_pharmacy_extract where patient_id=ede.patient_id and is_arv=1 order by 1 asc limit 1))), ' " +
+                "months')) as AgeARTStart, if((@ageLastVisit/*'*/:=/*'*/timestampdiff(YEAR, epd.dob, ehf.visit_date))" +
+                " > 0, concat(@ageLastVisit, ' years'), concat(@ageLastVisit/*'*/:=/*'*/timestampdiff(MONTH, epd.dob," +
+                " ehf.visit_date), ' months')) as AgeLastVisit, :siteCode, :facilityName, \"RegistrationDate\", " +
+                "(select cn.name from concept_name cn where cn.concept_id = ehe.entry_point and cn.locale=:locale " +
+                "order by field(cn.concept_name_type, 'SHORT','FULLY_SPECIFIED', 'NULL') LIMIT 1) as PatientSource,  " +
+                "epd.gender, @startARTDate as StartARTDate, ehe.date_started_art_at_transferring_facility as " +
+                "PreviousARTStartDate, '' as PreviousARTRegimen, (select visit_date from kenyaemr_etl" +
+                ".etl_pharmacy_extract where patient_id=ede.patient_id and is_arv=1 order by 1 asc limit 1) as " +
+                "StartARTAtThisFacility, ede.regimen, ede.regimen_line, (select epe.date_created from kenyaemr_etl" +
+                ".etl_pharmacy_extract epe where epe.patient_id=ede.patient_id and epe.is_arv=1 order by 1 desc limit" +
+                " 1) as LastARTDate, (select epe.regimen from kenyaemr_etl.etl_pharmacy_extract epe where epe" +
+                ".patient_id=ede.patient_id and epe.is_arv=1 order by 1 desc limit 1) as LastRegimen, \"\" as " +
+                "LastRegimenLine, \"\" as Duration, \"\" as ExpectedReturn,  ehf.visit_date, ehe" +
+                ".discontinuation_reason as ExitReason, ehe.date_of_discontinuation as ExitDate from kenyaemr_etl" +
+                ".etl_drug_event ede join kenyaemr_etl.etl_patient_demographics epd on " +
+                "ede.patient_id = epd.patient_id left join kenyaemr_etl.etl_hiv_enrollment ehe on ede.patient_id = " +
+                "ehe.patient_id left join kenyaemr_etl.etl_patient_hiv_followup ehf on ede.patient_id=ehf.patient_id " +
+                "where ede.voided=0 group by ede.id";
+
+        Map<String, Object> substitutions = new HashMap<String, Object>();
+        substitutions.put("siteCode", KenyaDqUtils.getMflCode());
+        substitutions.put("facilityName", KenyaDqUtils.getFacilityName());
+        substitutions.put("locale", CoreConstants.LOCALE);
+
+        return downloadCsvFile(dao.executeSqlQuery(query, substitutions), dwPatientExtractService
+                .getARTPatientExtractHeaderRow().toArray());
     }
 
     public byte[] downloadAll() {
-        return dwPatientExtractService.downloadAll();
+        String mfl = KenyaDqUtils.getMflCode();
+        Map<String, byte[]> contents = new HashMap<String, byte[]>();
+        contents.put("ARTPatientExtract" + "-" + location() + "-" + timeStamp() + mfl + ".csv",
+                downloadARTPatientExtract());
+        contents.put("PatientExtract" + "-" + location() + "-" + timeStamp() + mfl + ".csv", downloadPatientExtract());
+        contents.put("PatientLaboratoryExtract" + "-" + location() + "-" + timeStamp() + mfl + ".csv",
+                downloadPatientLaboratoryExtract());
+        contents.put("PatientPharmacyExtract" + "-" + location() + "-" + timeStamp() + mfl + ".csv",
+                downloadPatientPharmacyExtract());
+        contents.put("PatientStatusExtract" + "-" + location() + "-" + timeStamp() + mfl + ".csv",
+                downloadPatientStatusExtract());
+        contents.put("PatientVisitExtract" + "-" + location() + "-" + timeStamp() + mfl + ".csv",
+                downloadPatientVisitExtract());
+        contents.put("PatientWABWHOCD4Extract" + "-" + location() + "-" + timeStamp() + mfl + ".csv",
+                downloadPatientWABWHOCD4Extract());
+        byte[] ret = null;
+        try {
+            ret = dwPatientExtractService.zipBytes(contents);
+        } catch (Exception ex) {
+
+        }
+        return ret;
     }
 
     public String timeStamp() {
