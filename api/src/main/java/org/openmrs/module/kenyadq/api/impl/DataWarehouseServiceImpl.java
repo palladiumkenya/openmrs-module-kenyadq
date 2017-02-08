@@ -29,9 +29,17 @@ import org.openmrs.api.OrderService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.VisitService;
 import org.openmrs.module.kenyadq.api.DataWarehouseService;
+import org.openmrs.module.kenyadq.api.db.KenyaDqDao;
 import org.openmrs.module.kenyaemr.Metadata;
 import org.openmrs.module.kenyaemr.metadata.FacilityMetadata;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
+import org.openmrs.module.reporting.dataset.DataSet;
+import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
+import org.openmrs.module.reporting.dataset.definition.SqlDataSetDefinition;
+import org.openmrs.module.reporting.dataset.definition.service.DataSetDefinitionService;
+import org.openmrs.module.reporting.evaluation.EvaluationContext;
+import org.openmrs.module.reporting.evaluation.EvaluationException;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -90,6 +98,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
     @Qualifier("orderService")
     private OrderService orderService;
 
+
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final DateFormat OBS_DATE_FORMAT = new SimpleDateFormat("MM/dd/yy");
 
@@ -97,6 +106,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
 
     private final boolean SAMPLE = false;
     private final int SAMPLE_SIZE = 10;
+
 
     private List<Patient> patients;
     Map<Integer, EncounterInfo> firstEncounterMap = new HashMap<Integer, EncounterInfo>();
@@ -1475,4 +1485,5 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         }
         return "Unknown Location";
     }
+
 }
