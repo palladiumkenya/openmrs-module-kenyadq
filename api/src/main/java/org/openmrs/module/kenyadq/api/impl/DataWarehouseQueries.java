@@ -45,11 +45,13 @@ public class DataWarehouseQueries {
                 "fup.height as Height,\n" +
                 "fup.weight as Weight,\n" +
                 "concat(fup.systolic_pressure,'/',fup.diastolic_pressure) as BP,\n" +
-                "case fup.ctx_adherence \n" +
-                "when 159405 then 'Good'\n" +
-                "when 159406 then 'Fair'\n" +
-                "when 159407 then 'Poor'\n" +
-                "end as Adherence," +
+                "'ART|CTX' as AdherenceCategory, \n" +
+                "concat( \n" +
+                    "IF(fup.arv_adherence=159405, 'Good', IF(fup.arv_adherence=159406, 'Fair', IF(fup.arv_adherence=159407, 'Poor', ''))), '|', \n" +
+                    "IF(fup.ctx_adherence=159405, 'Good', IF(fup.ctx_adherence=159406, 'Fair', IF(fup.ctx_adherence=159407, 'Poor', ''))) \n" +
+                ") AS Adherence, \n" +
+                "'' as OI, \n" +
+                "'' as OIDate, \n" +
                 "case fup.family_planning_status \n" +
                 "when 695 then 'Currently using FP'\n" +
                 "when 160652 then 'Not using FP'\n" +
@@ -129,7 +131,7 @@ public class DataWarehouseQueries {
                 "min(hiv.date_confirmed_hiv_positive) as DateConfirmedHIVPositive,\n" +
                 "max(hiv.arv_status) as PreviousARTExposure,\n" +
                 "'KenyaEMR' as Emr,\n" +
-                "'I-TECH' as Project\n" +
+                "'I-TECH' as Project,'' as eWAB,'' as eWABDate,'' as bWAB,'' as bWABDate \n" +
                 "from kenyaemr_etl.etl_patient_demographics d\n" +
                 "left outer join kenyaemr_etl.etl_hiv_enrollment hiv on hiv.patient_id=d.patient_id\n" +
                 "left outer join kenyaemr_etl.etl_mch_enrollment mch on mch.patient_id=d.patient_id\n" +
@@ -139,6 +141,8 @@ public class DataWarehouseQueries {
                 "where unique_patient_no is not null\n"+
                 "group by d.patient_id\n" +
                 "order by d.patient_id;";
+
+
 
         return  sqlQuery;
     }
@@ -242,25 +246,29 @@ public class DataWarehouseQueries {
 
     public String labExtractQuery () {
 
-        String sqlQuery ="select l.patient_id,\n" +
-                "d.Gender,d.DOB,d.unique_patient_no,\n" +
-                "d.national_id_no,\n" +
-                "d.patient_clinic_number,\n" +
-                "l.visit_date, (select property_value\n" +
+        String sqlQuery ="select d.unique_patient_no as patientID, d.patient_id as patientPK, l.encounter_id as visitID, \n" +
+                "l.visit_date as orderedByDate,l.visit_date as reportedByDate, " +
+                "(select value_reference from location_attribute\n" +
+                "where location_id in (select property_value\n" +
                 "from global_property\n" +
-                "where property='kenyaemr.defaultLocation') as siteCode,\n" +
+                "where property='kenyaemr.defaultLocation') and attribute_type_id=1) as facilityID,\n" +
+                "(select value_reference from location_attribute\n" +
+                "where location_id in (select property_value\n" +
+                "from global_property\n" +
+                "where property='kenyaemr.defaultLocation') and attribute_type_id=1) as siteCode,\n" +
                 "(select name from location\n" +
                 "where location_id in (select property_value\n" +
                 "from global_property\n" +
-                "where property='kenyaemr.defaultLocation')) as siteName,\n" +
-                "cn.name as lab_test,\n" +
-                "l.lab_test,\n" +
-                "l.test_result,\n" +
+                "where property='kenyaemr.defaultLocation')) as facilityName,\n" +
+                "cn.name as testName,\n" +
+
+                //"l.lab_test,\n" +
+                //"l.test_result,\n" +
                 "case \n" +
                 "when c.datatype_id=2 then cn2.name\n" +
                 "else\n" +
                 "\tl.test_result\n" +
-                "end as lab_test_results\n" +
+                "end as lab_test_results, '' as enrollmentTest \n" +
                 "from kenyaemr_etl.etl_laboratory_extract l\n" +
                 "join kenyaemr_etl.etl_patient_demographics d on d.patient_id=l.patient_id\n" +
                 "join concept_name cn on cn.concept_id=l.lab_test and cn.concept_name_type='FULLY_SPECIFIED'\n" +
@@ -268,6 +276,7 @@ public class DataWarehouseQueries {
                 "join concept c on c.concept_id = l.lab_test\n" +
                 "left outer join concept_name cn2 on cn2.concept_id=l.test_result and cn2.concept_name_type='FULLY_SPECIFIED'\n" +
                 "and cn2.locale='en';";
+
 
         return  sqlQuery;
 
@@ -286,8 +295,8 @@ public class DataWarehouseQueries {
                 "from global_property\n" +
                 "where property='kenyaemr.defaultLocation') and attribute_type_id=1) as siteCode,\n" +
                 "ph.visit_id as VisitID,\n" +
-                "ph.visit_date as DispenseDate,\n" +
                 "if(cn2.name is not null, cn2.name,cn.name) as Drug,\n" +
+                "ph.visit_date as DispenseDate,\n" +
                 "duration,\n" +
                 "fup.next_appointment_date as ExpectedReturn\n" +
                 "from kenyaemr_etl.etl_pharmacy_extract ph\n" +
@@ -311,13 +320,11 @@ public class DataWarehouseQueries {
                 "(select value_reference from location_attribute\n" +
                 "where location_id in (select property_value\n" +
                 "from global_property\n" +
-                "where property='kenyaemr.defaultLocation') and attribute_type_id=1) as siteCode,\n" +
-                "(select name from location\n" +
+                "where property='kenyaemr.defaultLocation') and attribute_type_id=1) as facilityId,\n" +
+                "(select value_reference from location_attribute\n" +
                 "where location_id in (select property_value\n" +
                 "from global_property\n" +
-                "where property='kenyaemr.defaultLocation')) as FacilityName,\n" +
-                "-- p_dates.enrollment_date as aprox_enr,\n" +
-                "-- mid(max(if(l.visit_date<=p_dates.enrollment_date,concat(l.visit_date,test_result),null)),11) as Initial_Cd4_percent1,\n" +
+                "where property='kenyaemr.defaultLocation') and attribute_type_id=1) as siteCode,\n" +
                 " mid(max(if(l.visit_date<=p_dates.enrollment_date,concat(l.visit_date,test_result),null)),11) as eCd4,\n" +
                 " left(max(if(l.visit_date<=p_dates.enrollment_date,concat(l.visit_date,test_result),null)),10) as eCd4Date,\n" +
                 " if(fup.visit_date<=p_dates.enrollment_date,\n" +
@@ -358,7 +365,7 @@ public class DataWarehouseQueries {
                 " mid(max(if(l.visit_date>p_dates.six_month_date and l.visit_date<p_dates.twelve_month_date ,concat(l.visit_date,test_result),null)),11) as m6Cd4,\n" +
                 " left(max(if(l.visit_date>=p_dates.six_month_date and l.visit_date<p_dates.twelve_month_date ,concat(l.visit_date,test_result),null)),10) as m6Cd4Date,\n" +
                 " mid(max(if(l.visit_date>=p_dates.twelve_month_date,concat(l.visit_date,test_result),null)),11) as m6Cd4,\n" +
-                " left(max(if(l.visit_date>p_dates.twelve_month_date,concat(l.visit_date,test_result),null)),10) as m6Cd4Date\n" +
+                " left(max(if(l.visit_date>p_dates.twelve_month_date,concat(l.visit_date,test_result),null)),10) as m6Cd4Date,'' as eWAB,'' as eWABDate,'' as bWAB,'' as bWABDAte\n" +
                 "from kenyaemr_etl.etl_patient_hiv_followup fup\n" +
                 "join kenyaemr_etl.etl_patient_demographics d on d.patient_id=fup.patient_id\n" +
                 "join (select e.patient_id,date_add(date_add(min(e.visit_date),interval 3 month), interval 1 day) as enrollment_date,\n" +
@@ -390,12 +397,17 @@ public class DataWarehouseQueries {
         headerRow.add("Height");
         headerRow.add("Weight");
         headerRow.add("BP");
+        headerRow.add("AdherenceCategory");
         headerRow.add("Adherence");
+        headerRow.add("OI");
+        headerRow.add("OIDate");
         headerRow.add("FamilyPlanningMethod");
         headerRow.add("PwP");
         headerRow.add("GestationAge");
         headerRow.add("NextAppointmentDate");
         return headerRow;
+
+
     }
 
     public List<Object> getPatientHeaderRow() {
@@ -440,8 +452,8 @@ public class DataWarehouseQueries {
 
     public List<Object> getARTPatientExtractHeaderRow() {
         List<Object> headerRow = new ArrayList<Object>();
-        headerRow.add("PatientPK");
         headerRow.add("PatientID");
+        headerRow.add("PatientPK");
         headerRow.add("AgeEnrollment");
         headerRow.add("AgeARTStart");
         headerRow.add("AgeLastVisit");
@@ -469,19 +481,18 @@ public class DataWarehouseQueries {
 
     public List<Object> getLabExtractHeaderRow() {
         List<Object> headerRow = new ArrayList<Object>();
-        headerRow.add("patient_id");
-        headerRow.add("Gender");
-        headerRow.add("DOB");
-        headerRow.add("unique_patient_no");
-        headerRow.add("national_id_no");
-        headerRow.add("patient_clinic_number");
-        headerRow.add("visit_date");
-        headerRow.add("siteCode");
-        headerRow.add("siteName");
-        headerRow.add("lab_test");
-        headerRow.add("lab_test");
-        headerRow.add("test_result");
-        headerRow.add("lab_test_results");
+        headerRow.add("PatientID");
+        headerRow.add("PatientPK");
+        headerRow.add("VisitID");
+        headerRow.add("OrderedByDate");
+        headerRow.add("ReportedByDate");
+        headerRow.add("FacilityID");
+        headerRow.add("SiteCode");
+        headerRow.add("FacilityName");
+        headerRow.add("TestName");
+        headerRow.add("TestResult");
+        headerRow.add("EnrollmentTest");
+
 
         return  headerRow;
 
@@ -490,9 +501,9 @@ public class DataWarehouseQueries {
     public List<Object> getPatientPharmacyExtractHeaderRow() {
         List<Object> headerRow = new ArrayList<Object>();
         headerRow.add("PatientID");
-        headerRow.add("SiteCode");
-        headerRow.add("FacilityName");
         headerRow.add("PatientPK");
+        headerRow.add("FacilityName");
+        headerRow.add("SiteCode");
         headerRow.add("VisitID");
         headerRow.add("Drug");
         headerRow.add("DispenseDate");
@@ -501,6 +512,7 @@ public class DataWarehouseQueries {
         headerRow.add("TreatmentType");
         headerRow.add("PeriodTaken");
         headerRow.add("ProphylaxisType");
+        headerRow.add("RegimenLine");
         return headerRow;
     }
 
@@ -526,6 +538,17 @@ public class DataWarehouseQueries {
         headerRow.add("m12CD4Date");
         headerRow.add("m6CD4");
         headerRow.add("m6CD4Date");
+        headerRow.add("eWAB");
+        headerRow.add("eWABDate");
+        headerRow.add("bWAB");
+        headerRow.add("bWABDate");
         return headerRow;
     }
 }
+
+
+
+
+
+
+

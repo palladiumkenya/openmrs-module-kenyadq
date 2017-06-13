@@ -24,7 +24,6 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
-import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.kenyacore.CoreConstants;
 import org.openmrs.module.kenyadq.DqConstants;
@@ -32,12 +31,12 @@ import org.openmrs.module.kenyadq.api.KenyaDqService;
 import org.openmrs.module.kenyadq.api.db.KenyaDqDao;
 import org.openmrs.module.kenyadq.utils.KenyaDqUtils;
 import org.openmrs.module.kenyaemr.Metadata;
-import org.openmrs.module.kenyaemr.api.KenyaEmrService;
-import org.openmrs.module.kenyaemr.wrapper.Facility;
 import org.openmrs.serialization.SerializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,8 +44,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Module service implementation
@@ -165,6 +162,7 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 
     public byte[] downloadCsvFile(List<Object> data, Object[] headerRow) {
         StringWriter stringWriter = new StringWriter();
+        final char csvDelimeter = ',';
         CSVWriter writer = new CSVWriter(stringWriter);
         try {
             if (headerRow != null) {
@@ -738,7 +736,7 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
 
     private void labExtractColumnHeaders(List<Object> columnHeaders) {
 
-        columnHeaders.add("patient_id");
+        columnHeaders.add("PatientID");
         columnHeaders.add("Gender");
         columnHeaders.add("DOB");
         columnHeaders.add("unique_patient_no");
@@ -747,31 +745,10 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
         columnHeaders.add("visit_date");
         columnHeaders.add("siteCode");
         columnHeaders.add("siteName");
-        columnHeaders.add("lab_test");
-        columnHeaders.add("lab_test");
+        columnHeaders.add("TestName ");
         columnHeaders.add("test_result");
-        columnHeaders.add("lab_test_results");
-//        columnHeaders.add("death_date");
-//        columnHeaders.add("cause_of_death");
-////		headerRow.add("telephone");
-//        columnHeaders.add("postal_address");
-//        columnHeaders.add("school_employer_address");
-//        columnHeaders.add("location");
-//        columnHeaders.add("village_estate");
-//        columnHeaders.add("county");
-//        columnHeaders.add("district");
-//        columnHeaders.add("sub_location");
-//        columnHeaders.add("landmark");
-////		headerRow.add("subchief");
-//        columnHeaders.add("province");
-//        columnHeaders.add("division");
-//        columnHeaders.add("house_no");
-//        columnHeaders.add("patient_voided");
-//        columnHeaders.add("visit_uuid");
-//        columnHeaders.add("visit_type");
-//        columnHeaders.add("visit_start_date");
-//        columnHeaders.add("visit_end_date");
-//        columnHeaders.add("obs_uuid");
+        columnHeaders.add("TestResult ");
+
     }
 
 }

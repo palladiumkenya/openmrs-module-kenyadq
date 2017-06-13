@@ -107,6 +107,7 @@
 		</dependency>
 
 		<!-- End OpenMRS core -->
+		<!-- Begin external dependencies -->
 
 	</dependencies>
 

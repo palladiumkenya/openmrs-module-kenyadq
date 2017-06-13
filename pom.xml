@@ -185,6 +185,10 @@
 
             <!-- End OpenMRS core -->
 
+            <!-- Begin external dependencies -->
+
+            <!-- end external dependencies-->
+
             <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
