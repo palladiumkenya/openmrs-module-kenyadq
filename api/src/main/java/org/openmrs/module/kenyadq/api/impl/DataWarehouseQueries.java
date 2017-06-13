@@ -130,6 +130,7 @@ public class DataWarehouseQueries {
                 "d.education_level as EducationLevel,\n" +
                 "min(hiv.date_confirmed_hiv_positive) as DateConfirmedHIVPositive,\n" +
                 "max(hiv.arv_status) as PreviousARTExposure,\n" +
+                "'' as PreviousARTStartDate,\n" +
                 "'KenyaEMR' as Emr,\n" +
                 "'I-TECH' as Project,'' as eWAB,'' as eWABDate,'' as bWAB,'' as bWABDate \n" +
                 "from kenyaemr_etl.etl_patient_demographics d\n" +
@@ -198,6 +199,9 @@ public class DataWarehouseQueries {
                 "else cn.name\n" +
                 "end as PatientSource,\n" +
                 "reg.art_start_date as StartARTDate,\n" +
+                "'' as PreviousARTStartDate,\n" +
+                "'' as PreviousARTRegimen,\n" +
+                "'' as StartARTAtThisFacility,\n" +
                 "reg.regimen as StartRegimen,\n" +
                 "reg.regimen_line as StartRegimenLine,\n" +
                 "reg.last_art_date as LastARTDate,\n" +
@@ -340,6 +344,10 @@ public class DataWarehouseQueries {
                 " end,null) as ewhostage,\n" +
                 " if(fup.visit_date<=p_dates.enrollment_date and who_stage is not null,\n" +
                 "fup.visit_date,null) as ewhodate,\n" +
+                "'' as bCD4,\n" +
+                "'' as bCD4Date,\n" +
+                "'' as bWHO,\n" +
+                "'' as bWHODate,\n" +
                 " mid(max(concat(fup.visit_date,case who_stage\n" +
                 "\twhen 1220 then 'WHO_STAGE_1'\n" +
                 "\twhen 1221 then 'WHO_STAGE_2'\n" +
@@ -412,29 +420,29 @@ public class DataWarehouseQueries {
 
     public List<Object> getPatientHeaderRow() {
         List<Object> headerRow = new ArrayList<Object>();
-        headerRow.add("PatientID");
-        headerRow.add("PatientPK");
-        headerRow.add("SiteCode");
-        headerRow.add("FacilityName");
-        headerRow.add("Gender");
-        headerRow.add("DOB");
-        headerRow.add("RegistrationDate");
-        headerRow.add("RegistrationAtCCC");
-        headerRow.add("RegistrationATPMTCT");
-        headerRow.add("RegistrationAtTBClinic");
-        headerRow.add("PatientSource");
-        headerRow.add("Region");
-        headerRow.add("District");
-        headerRow.add("Village");
-        headerRow.add("ContactRelation");
-        headerRow.add("LastVisit");
-        headerRow.add("MaritalStatus");
-        headerRow.add("EducationLevel");
-        headerRow.add("DateConfirmedHIVPositive");
-        headerRow.add("PreviousARTExposure");
-//        headerRow.add("PreviousARTStartDate");
-        headerRow.add("Emr");
-        headerRow.add("Project");
+            headerRow.add("PatientID");
+            headerRow.add("PatientPK");
+            headerRow.add("SiteCode");
+            headerRow.add("FacilityName");
+            headerRow.add("Gender");
+            headerRow.add("DOB");
+            headerRow.add("RegistrationDate");
+            headerRow.add("RegistrationAtCCC");
+            headerRow.add("RegistrationATPMTCT");
+            headerRow.add("RegistrationAtTBClinic");
+            headerRow.add("PatientSource");
+            headerRow.add("Region");
+            headerRow.add("District");
+            headerRow.add("Village");
+            headerRow.add("ContactRelation");
+            headerRow.add("LastVisit");
+            headerRow.add("MaritalStatus");
+            headerRow.add("EducationLevel");
+            headerRow.add("DateConfirmedHIVPositive");
+            headerRow.add("PreviousARTExposure");
+            headerRow.add("PreviousARTStartDate");
+            headerRow.add("Emr");
+            headerRow.add("Project");
         return headerRow;
     }
 
@@ -463,9 +471,9 @@ public class DataWarehouseQueries {
         headerRow.add("PatientSource");
         headerRow.add("Gender");
         headerRow.add("StartARTDate");
-//        headerRow.add("PreviousARTStartDate");
-//        headerRow.add("PreviousARTRegimen");
-//        headerRow.add("StartARTAtThisFacility");
+        headerRow.add("PreviousARTStartDate");
+        headerRow.add("PreviousARTRegimen");
+        headerRow.add("StartARTAtThisFacility");
         headerRow.add("StartRegimen");
         headerRow.add("StartRegimenLine");
         headerRow.add("LastARTDate");
@@ -526,10 +534,10 @@ public class DataWarehouseQueries {
         headerRow.add("eCD4Date");
         headerRow.add("eWHO");
         headerRow.add("eWHODate");
-//        headerRow.add("bCD4");
-//        headerRow.add("bCD4Date");
-//        headerRow.add("bWHO");
-//        headerRow.add("bWHODate");
+        headerRow.add("bCD4");
+        headerRow.add("bCD4Date");
+        headerRow.add("bWHO");
+        headerRow.add("bWHODate");
         headerRow.add("lastWHO");
         headerRow.add("lastWHODate");
         headerRow.add("lastCD4");
