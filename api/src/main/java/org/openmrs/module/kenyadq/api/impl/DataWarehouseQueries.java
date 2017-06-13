@@ -469,7 +469,6 @@ public class DataWarehouseQueries {
         headerRow.add("FacilityName");
         headerRow.add("RegistrationDate");
         headerRow.add("PatientSource");
-        headerRow.add("Gender");
         headerRow.add("StartARTDate");
         headerRow.add("PreviousARTStartDate");
         headerRow.add("PreviousARTRegimen");
