@@ -210,7 +210,6 @@ public class DataWarehouseQueries {
                 "reg.latest_tca as ExpectedReturn,\n" +
                 "reg.latest_vis_date as LastVisit,\n" +
                 "timestampdiff(month,reg.art_start_date, reg.latest_vis_date) as duration,\n" +
-                "d.Gender,\n" +
                 "disc.visit_date as ExitDate,\n" +
                 "case\n" +
                 "when disc.discontinuation_reason is not null then dis_rsn.name\n" +
@@ -479,10 +478,11 @@ public class DataWarehouseQueries {
         headerRow.add("LastRegimen");
         headerRow.add("LastRegimenLine");
         headerRow.add("ExpectedReturn");
-        headerRow.add("Duration");
         headerRow.add("LastVisit");
-        headerRow.add("ExitReason");
+        headerRow.add("Duration");
         headerRow.add("ExitDate");
+        headerRow.add("ExitReason");
+
         return headerRow;
     }
 
