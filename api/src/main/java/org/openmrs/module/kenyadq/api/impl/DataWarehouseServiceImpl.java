@@ -4,8 +4,10 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Weeks;
 import org.joda.time.Years;
+import org.openmrs.CareSetting;
 import org.openmrs.Concept;
 import org.openmrs.ConceptName;
+import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
@@ -15,6 +17,7 @@ import org.openmrs.LocationAttribute;
 import org.openmrs.LocationAttributeType;
 import org.openmrs.Obs;
 import org.openmrs.Order;
+import org.openmrs.OrderType;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.Person;
@@ -28,10 +31,12 @@ import org.openmrs.api.ObsService;
 import org.openmrs.api.OrderService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.VisitService;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.kenyadq.api.DataWarehouseService;
 import org.openmrs.module.kenyadq.api.db.KenyaDqDao;
 import org.openmrs.module.kenyaemr.Metadata;
 import org.openmrs.module.kenyaemr.metadata.FacilityMetadata;
+import org.openmrs.module.kenyaemr.util.EmrUtils;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
@@ -106,6 +111,9 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
 
     private final boolean SAMPLE = false;
     private final int SAMPLE_SIZE = 10;
+
+    CareSetting outpatient = Context.getOrderService().getCareSettingByName("OUTPATIENT");
+    OrderType drugOrderType = Context.getOrderService().getOrderTypeByUuid(OrderType.DRUG_ORDER_TYPE_UUID);
 
 
     private List<Patient> patients;
@@ -1379,15 +1387,16 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
     }
 
     private Date getARTInitDate(Patient patient) {
-        List<Order> orders = orderService.getOrdersByPatient(patient);
+
+        List<Order> orders = orderService.getOrders(patient, outpatient, drugOrderType, false);//getOrdersByPatient(patient);
         if (orders != null && !orders.isEmpty()) {
             Collections.sort(orders, new Comparator<Order>() {
                 @Override
                 public int compare(Order o1, Order o2) {
-                    return o1.getStartDate().compareTo(o2.getStartDate());
+                    return o1.getDateActivated().compareTo(o2.getDateActivated());
                 }
             });
-            return orders.get(0).getStartDate();
+            return orders.get(0).getDateActivated();
         }
         return null;
     }
@@ -1395,16 +1404,16 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
     private Map<String, List<Order>> getDrugOrders(Patient patient) {
         Map<String, List<Order>> collectiveOrders = new LinkedHashMap<String, List<Order>>();
 
-        List<Order> orders = orderService.getOrdersByPatient(patient);
+        List<Order> orders = orderService.getOrders(patient, outpatient, drugOrderType, false);//getOrdersByPatient(patient);
         if (orders != null && !orders.isEmpty()) {
             Collections.sort(orders, new Comparator<Order>() {
                 @Override
                 public int compare(Order o1, Order o2) {
-                    return o1.getStartDate().compareTo(o2.getStartDate());
+                    return o1.getDateActivated().compareTo(o2.getDateActivated());
                 }
             });
             for (Order order : orders) {
-                String date = DATE_FORMAT.format(order.getStartDate());
+                String date = DATE_FORMAT.format(order.getDateActivated());
                 if (!collectiveOrders.containsKey(date)) {
                     collectiveOrders.put(date, new ArrayList<Order>());
                 }
