@@ -823,7 +823,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
     private String getRegimen(List<Order> drugOrders) {
         String regimen = "";
         for (Order drugOrder : drugOrders) {
-            ConceptName name = drugOrder.getConcept().getBestShortName(Locale.ENGLISH);
+            ConceptName name = drugOrder.getConcept().getShortNameInLocale(Locale.ENGLISH);
             if (name != null) {
                 regimen += name.getName() + "+";
             }
@@ -1093,7 +1093,8 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         }
 
         List<Encounter> encounters = encounterService.getEncounters(patient, null, null, null, forms, encounterTypes,
-                null, true);
+                null, null, null, true);
+
         if (encounters != null && !encounters.isEmpty()) {
             for (Encounter encounter : encounters) {
                 EncounterInfo encounterInfo = new EncounterInfo();
@@ -1134,7 +1135,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         }
         List<VisitInfo> visitInfos = new ArrayList<VisitInfo>();
         List<Encounter> encounters = encounterService.getEncounters(patient, null, null, null, null, encounterTypes,
-                null, true);
+                null,null, null, true);
         if (encounters != null && !encounters.isEmpty()) {
             for (Encounter encounter : encounters) {
                 Visit visit = encounter.getVisit();
@@ -1363,15 +1364,15 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
     }
 
     private Date getARTInitDate(Patient patient) {
-        List<Order> orders = orderService.getOrdersByPatient(patient);
+        List<Order> orders = orderService.getAllOrdersByPatient(patient);
         if (orders != null && !orders.isEmpty()) {
             Collections.sort(orders, new Comparator<Order>() {
                 @Override
                 public int compare(Order o1, Order o2) {
-                    return o1.getStartDate().compareTo(o2.getStartDate());
+                    return o1.getDateActivated().compareTo(o2.getDateActivated());
                 }
             });
-            return orders.get(0).getStartDate();
+            return orders.get(0).getDateActivated();
         }
         return null;
     }
@@ -1379,16 +1380,16 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
     private Map<String, List<Order>> getDrugOrders(Patient patient) {
         Map<String, List<Order>> collectiveOrders = new LinkedHashMap<String, List<Order>>();
 
-        List<Order> orders = orderService.getOrdersByPatient(patient);
+        List<Order> orders = orderService.getAllOrdersByPatient(patient);
         if (orders != null && !orders.isEmpty()) {
             Collections.sort(orders, new Comparator<Order>() {
                 @Override
                 public int compare(Order o1, Order o2) {
-                    return o1.getStartDate().compareTo(o2.getStartDate());
+                    return o1.getDateActivated().compareTo(o2.getDateActivated());
                 }
             });
             for (Order order : orders) {
-                String date = DATE_FORMAT.format(order.getStartDate());
+                String date = DATE_FORMAT.format(order.getDateActivated());
                 if (!collectiveOrders.containsKey(date)) {
                     collectiveOrders.put(date, new ArrayList<Order>());
                 }
