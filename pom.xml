@@ -33,20 +33,20 @@
     </modules>
 
     <properties>
-        <openMRSVersion>1.9.7</openMRSVersion>
+        <openMRSVersion>2.0.7</openMRSVersion>
 
         <!-- Module dependencies -->
-        <appframeworkVersion>2.2.1</appframeworkVersion>
-        <calculationVersion>1.1</calculationVersion>
-        <idgenVersion>2.6</idgenVersion>
-        <kenyacoreVersion>2.3</kenyacoreVersion>
-        <kenyauiVersion>2.0.4</kenyauiVersion>
-        <metadatadeployVersion>1.4</metadatadeployVersion>
-        <metadatasharingVersion>1.1.8</metadatasharingVersion>
-        <reportingVersion>0.9.2.1</reportingVersion>
-        <serializationxstreamVersion>0.2.7</serializationxstreamVersion>
-        <uiframeworkVersion>3.2.2</uiframeworkVersion>
-        <kenyaemrVersion>14.2</kenyaemrVersion>
+        <appframeworkVersion>2.13.0</appframeworkVersion>
+        <calculationVersion>1.2</calculationVersion>
+        <idgenVersion>4.5.0</idgenVersion>
+        <kenyacoreVersion>2.4.2-SNAPSHOT</kenyacoreVersion>
+        <kenyauiVersion>2.1.1</kenyauiVersion>
+        <metadatadeployVersion>1.11.0</metadatadeployVersion>
+        <metadatasharingVersion>1.5.0</metadatasharingVersion>
+        <reportingVersion>1.18.0</reportingVersion>
+        <serializationxstreamVersion>0.2.14</serializationxstreamVersion>
+        <uiframeworkVersion>3.15.0</uiframeworkVersion>
+        <kenyaemrVersion>17.0.3</kenyaemrVersion>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
