@@ -99,9 +99,9 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
     @Qualifier("conceptService")
     private ConceptService conceptService;
 
-    @Autowired
+/*    @Autowired
     @Qualifier("orderService")
-    private OrderService orderService;
+    private OrderService orderService;*/
 
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -111,9 +111,6 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
 
     private final boolean SAMPLE = false;
     private final int SAMPLE_SIZE = 10;
-
-    CareSetting outpatient = Context.getOrderService().getCareSettingByName("OUTPATIENT");
-    OrderType drugOrderType = Context.getOrderService().getOrderTypeByUuid(OrderType.DRUG_ORDER_TYPE_UUID);
 
 
     private List<Patient> patients;
@@ -565,7 +562,9 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         //check if 1st cd4/who is within 3 months of enrollment
 
         //pick last cd4/who
-        List<Object> data = new ArrayList<Object>();
+
+        //TODO; this whole code fails when loading the module. a similar functionality has been introduced to collect the same from ETL tables
+        /*List<Object> data = new ArrayList<Object>();
         List<Patient> patients = getPatients();
         int i = 0;
         for (Patient patient : patients) {
@@ -670,7 +669,8 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
                 ex.printStackTrace();
             }
         }
-        return csvCreator.createCsv(data, getPatientWABWHOCD4ExtractHeaderRow());
+        return csvCreator.createCsv(data, getPatientWABWHOCD4ExtractHeaderRow());*/
+        return null;
     }
 
     private boolean datesWithinDays(Date one, Date two, int days) {
@@ -1388,7 +1388,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
 
     private Date getARTInitDate(Patient patient) {
 
-        List<Order> orders = orderService.getOrders(patient, outpatient, drugOrderType, false);//getOrdersByPatient(patient);
+        /*List<Order> orders = orderService.getOrders(patient, outpatient, drugOrderType, false);//getOrdersByPatient(patient);
         if (orders != null && !orders.isEmpty()) {
             Collections.sort(orders, new Comparator<Order>() {
                 @Override
@@ -1397,14 +1397,14 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
                 }
             });
             return orders.get(0).getDateActivated();
-        }
+        }*/
         return null;
     }
 
     private Map<String, List<Order>> getDrugOrders(Patient patient) {
         Map<String, List<Order>> collectiveOrders = new LinkedHashMap<String, List<Order>>();
 
-        List<Order> orders = orderService.getOrders(patient, outpatient, drugOrderType, false);//getOrdersByPatient(patient);
+        /*List<Order> orders = orderService.getOrders(patient, outpatient, drugOrderType, false);//getOrdersByPatient(patient);
         if (orders != null && !orders.isEmpty()) {
             Collections.sort(orders, new Comparator<Order>() {
                 @Override
@@ -1420,7 +1420,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
                 List<Order> orderedAtOnce = collectiveOrders.get(date);
                 orderedAtOnce.add(order);
             }
-        }
+        }*/
         return collectiveOrders;
     }
 
