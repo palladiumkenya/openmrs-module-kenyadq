@@ -17,12 +17,14 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.ConceptDatatype;
 import org.openmrs.ConceptDescription;
+import org.openmrs.Order;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.LocationService;
+import org.openmrs.api.OrderService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.kenyacore.CoreConstants;
@@ -60,7 +62,7 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
     private DataWarehouseServiceImpl dwPatientExtractService;
 
     @Autowired
-    private LocationService locationService;
+    private OrderService orderService;
 
     private KenyaDqDao dao;
 
@@ -75,6 +77,13 @@ public class KenyaDqServiceImpl extends BaseOpenmrsService implements KenyaDqSer
         try {
             Set<PatientIdentifier> preferredPatientIdentifiers = new HashSet<PatientIdentifier>(preferred
                     .getActiveIdentifiers());
+
+            List<Order> orders = orderService.getAllOrdersByPatient(notPreferred);
+            for (Order order : orders) {
+                if (!order.isVoided()) {
+                    orderService.voidOrder(order, "Requirement for patient merge");
+                }
+            }
 
             patientService.mergePatients(preferred, notPreferred);
 
