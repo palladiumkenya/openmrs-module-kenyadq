@@ -841,7 +841,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
     private String getRegimen(List<Order> drugOrders) {
         String regimen = "";
         for (Order drugOrder : drugOrders) {
-            ConceptName name = drugOrder.getConcept().getBestShortName(Locale.ENGLISH);
+            ConceptName name = drugOrder.getConcept().getShortNameInLocale(Locale.ENGLISH);
             if (name != null) {
                 regimen += name.getName() + "+";
             }
@@ -1117,7 +1117,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         }
 
         List<Encounter> encounters = encounterService.getEncounters(patient, null, null, null, forms, encounterTypes,
-                null, true);
+                null, null,null, true);
         if (encounters != null && !encounters.isEmpty()) {
             for (Encounter encounter : encounters) {
                 EncounterInfo encounterInfo = new EncounterInfo();
@@ -1158,7 +1158,7 @@ public class DataWarehouseServiceImpl implements DataWarehouseService {
         }
         List<VisitInfo> visitInfos = new ArrayList<VisitInfo>();
         List<Encounter> encounters = encounterService.getEncounters(patient, null, null, null, null, encounterTypes,
-                null, true);
+                null,null,null, true);
         if (encounters != null && !encounters.isEmpty()) {
             for (Encounter encounter : encounters) {
                 Visit visit = encounter.getVisit();
