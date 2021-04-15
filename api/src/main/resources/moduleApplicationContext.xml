@@ -97,7 +97,7 @@
 		<property name="moduleService">
 			<list>
 				<value>org.openmrs.module.kenyadq.api.KenyaDqService</value>
-				<ref local="kenyaDqService"/>
+				<ref bean="kenyaDqService"/>
 			</list>
 		</property>
 	</bean>
